@@ -1,10 +1,11 @@
-from django.urls import path
-from .views import *
+from .views import ConversacionViewSet
+from rest_framework.routers import SimpleRouter
+from django.urls import path, include
+
+router = SimpleRouter()
+
+router.register(r'api', ConversacionViewSet)
 
 urlpatterns = [
-    path("api/find/", findAll, name="ver"),
-    path("api/find/<int:id>/", findOne, name="ver"),
-    path("api/create/", create, name="agregar"),
-    path("api/update/", update, name="lista"),
-    path('api/kill/',kill,name='post'),
+    path('', include(router.urls)),
 ]

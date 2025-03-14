@@ -1,10 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import SimpleRouter
+from .views import MensajeViewSet
+
+router = SimpleRouter()
+
+router.register(r'api', MensajeViewSet)
 from .views import *
 
 urlpatterns = [
-    path("api/find/", findAll, name="ver"),
-    path("api/find/<int:id>/", findOne, name="ver"),
-    path("api/create/", create, name="agregar"),
-    path("api/update/", update, name="lista"),
-    path('api/kill/',kill,name='post'),
+    path('', include(router.urls))
 ]
