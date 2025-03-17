@@ -1,20 +1,26 @@
-# kuroBack/users/backends.py
-from django.contrib.auth.backends import BaseBackend
-from django.contrib.auth import get_user_model
+from rest_framework.permissions import BasePermission
+from django.db import connection
+from datetime import datetime
 
-User = get_user_model()
-
-class EmailBackend(BaseBackend):
-    def authenticate(self, request, email=None, password=None, **kwargs):
-        try:
-            user = User.objects.get(email=email)
-            if user.check_password(password):
-                return user
-        except User.DoesNotExist:
-            return None
-
-    def get_user(self, user_id):
-        try:
-            return User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return None
+class IsTokenValid(BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            header = request.headers.get('Authorization')
+            if header is not None:
+                token = header.split(' ')[1]
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT * FROM users_token WHERE key_pass = %s", [token])
+                    result = cursor.fetchone()
+                    if result is None:
+                        self.detail = 'Token not found'
+                        return False
+                    else:
+                        is_expired = result[4] < datetime.now()
+                        if is_expired:
+                            self.message = 'Token expired'
+                            return False
+                        else:
+                            return True
+            else:
+                self.detail = 'Token not found'
+                return False

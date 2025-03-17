@@ -29,8 +29,7 @@ SECRET_KEY = 'django-insecure-vuf1=c#(+0#f&8m95!yki)=enk)m1-bxtz89x8ia@3^!_x30+9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -41,11 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'users',
     'configuracionesaplicacion',
     'mensajes',
     'conversaciones',
+    'rest_framework',
     'corsheaders'
 ]
 
@@ -101,6 +100,7 @@ DATABASES = {
         'PORT': 3306,
     }
 }
+
 
 
 # Password validation
