@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import SideBar from './components/SideBar'
-import { ChatView } from './components/ChatView'
+import { ChatView } from './components/chat/ChatView'
 
 function App() {
   const [count, setCount] = useState(0)
