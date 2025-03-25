@@ -2,21 +2,16 @@ import { useState } from 'react'
 import './App.css'
 import SideBar from './components/SideBar'
 import { ChatView } from './components/chat/ChatView'
+import {BrowserRouter} from 'react-router-dom'
+import Router from './Router'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <>
-    <div className="flex flex-row">
-      <aside className="col-3">
-        <SideBar />
-      </aside>
-      <div className="col-9">
-        <ChatView />
-        </div>
-    </div>
-    </>
+    <BrowserRouter>
+    <Router/>
+    </BrowserRouter>
   )
 }
 

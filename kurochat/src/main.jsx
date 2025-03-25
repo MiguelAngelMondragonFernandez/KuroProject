@@ -5,7 +5,6 @@ import '/node_modules/primeflex/primeflex.css'
 import 'primeflex/themes/primeone-dark.css';
 import 'primeicons/primeicons.css';
 import App from './App.jsx'
-import UserForm from './users/UserForm.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
