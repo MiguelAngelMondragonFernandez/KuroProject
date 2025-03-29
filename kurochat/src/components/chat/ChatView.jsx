@@ -68,24 +68,25 @@ const itemTemplate = (item) => {
 
     return (
         <>
-            <div className="flex flex-row">
+            <div className="flex flex-row " style={{background:"var(--theme-color)" ,color:"Var(--text-color)"}} >
                 <p>nombre de la persona</p>
             </div>
-            <div className="card flex justify-content-center">
+            <div className="card flex justify-content-center"  style={{background:"var(--theme-color)" ,color:"Var(--text-color)"}}>
                 <VirtualScroller
                     ref={virtualScrollerRef} // Referencia al VirtualScroller
                     items={items}
                     itemSize={50}
                     itemTemplate={itemTemplate}
-                    className="border-1 surface-border border-round w-full h-screen"
+                    className="border-1 surface-border border-round w-full h-screen "
                 />
             </div>
-            <div className="flex flex-row">
+            <div className="flex flex-row"   style={{background:"var(--theme-color)" ,color:"Var(--text-color)"}}>
                 <InputText
                     placeholder="Escribe tu mensaje"
                     className="w-full"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
+                    style={{ backgroundColor: 'var(--theme-color)', color: 'var(--text-color)', borderColor: 'var(--text-color)' }} 
                 />
                 <i
                     className="pi pi-image"
