@@ -20,6 +20,7 @@ class IsTokenValid(BasePermission):
                             self.message = 'Token expired'
                             return False
                         else:
+                            
                             return True
             else:
                 self.detail = 'Token not found'
