@@ -2,44 +2,63 @@ import React, { useState, useEffect, useRef } from 'react';
 import { VirtualScroller } from 'primereact/virtualscroller';
 import { InputText } from 'primereact/inputtext';
 import Message from './Message';
+import axios from '../../utils/httpgateway';
 
 export const ChatView = () => {
     const [items, setItems] = useState([]);
     const [message, setMessage] = useState('');
+    const [userId, setUserId] = useState(null); // Estado para almacenar el ID del usuario autenticado
     const fileInputRef = useRef(null);
-    const virtualScrollerRef = useRef(null); // Referencia al VirtualScroller
+    const virtualScrollerRef = useRef(null);
 
-    const getMessage = () => {
-        const listMessages = [
-            { idUser: 1, message: 'Hello', date: "2021-09-01T00:00:00.000Z" },
-            { idUser: 2, message: 'Hi', date: "2021-09-01T00:00:00.000Z" },
-            { idUser: 1, message: 'How are you?', date: "2021-09-01T00:00:00.000Z" },
-            { idUser: 2, message: 'I am fine', date: "2021-09-01T00:00:00.000Z" },
-            { idUser: 1, message: 'Good to hear that', date: "2021-09-01T00:00:00.000Z" }
-        ];
-        setItems(listMessages);
+    // Obtener el ID del usuario autenticado
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await axios.doGet('auth/user/'); 
+                setUserId(response.data.idUser); 
+            } catch (error) {
+                console.error('Error al obtener el usuario autenticado:', error);
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    const getMessage = async () => {
+        try {
+            const response = await axios.doGet('mensajes/api/');
+            setItems(response.data); 
+        } catch (error) {
+            console.error('Error al obtener mensajes:', error);
+        }
     };
 
     useEffect(() => {
         getMessage();
     }, []);
 
-    // Forzar el scroll al final cuando se actualiza la lista de mensajes
     useEffect(() => {
         if (virtualScrollerRef.current) {
-            virtualScrollerRef.current.scrollToIndex(items.length - 1); // Scroll al último elemento
+            virtualScrollerRef.current.scrollToIndex(items.length - 1);
         }
     }, [items]);
 
-    const handleSendMessage = () => {
-        if (message.trim() !== '') {
+    const handleSendMessage = async () => {
+        if (message.trim() !== '' && userId) {
             const newMessage = {
-                idUser: 1,
+                idUser: userId, 
                 message: message,
-                date: new Date().toISOString()
+                date: new Date().toISOString(),
             };
-            setItems((prevItems) => [...prevItems, newMessage]); // Agregar el nuevo mensaje
-            setMessage(''); // Limpiar el input
+
+            try {
+                const response = await axios.doPost('mensajes/api/', newMessage);
+                setItems((prevItems) => [...prevItems, response.data]); 
+                setMessage(''); // Limpia el input
+            } catch (error) {
+                console.error('Error al enviar mensaje:', error);
+            }
         }
     };
 
@@ -51,36 +70,43 @@ export const ChatView = () => {
         const file = event.target.files[0];
         if (file) {
             console.log('Archivo seleccionado:', file);
-            // Aquí puedes agregar la lógica para enviar la imagen
+            
         }
     };
-const itemTemplate = (item) => {
-    if (!item) return null; // Manejo de elementos vacíos
 
-    return (
-        <Message
-            idUser={item.idUser}
-            message={item.message}
-            date={item.date}
-        />
-    );
-};
+    const itemTemplate = (item) => {
+        if (!item) return null;
+
+        return (
+            <Message
+                idUser={item.idUser}
+                message={item.message}
+                date={item.date}
+            />
+        );
+    };
 
     return (
         <>
-            <div className="flex flex-row">
+            <div className="flex flex-row" style={{ marginBottom: '-15px', marginTop: '-10px' }}>
                 <p>nombre de la persona</p>
             </div>
             <div className="card flex justify-content-center">
                 <VirtualScroller
-                    ref={virtualScrollerRef} // Referencia al VirtualScroller
+                    ref={virtualScrollerRef}
                     items={items}
                     itemSize={50}
                     itemTemplate={itemTemplate}
                     className="border-1 surface-border border-round w-full h-screen"
+                    style={{ backgroundColor: '#EEE3CF' }}
                 />
             </div>
             <div className="flex flex-row">
+                <i
+                    className="pi pi-image"
+                    style={{ fontSize: '2rem', marginLeft: '10px', marginRight: '15px' }}
+                    onClick={handleSendImage}
+                ></i>
                 <InputText
                     placeholder="Escribe tu mensaje"
                     className="w-full"
@@ -88,13 +114,8 @@ const itemTemplate = (item) => {
                     onChange={(e) => setMessage(e.target.value)}
                 />
                 <i
-                    className="pi pi-image"
-                    style={{ fontSize: '2rem', marginLeft: '10px' }}
-                    onClick={handleSendImage}
-                ></i>
-                <i
                     className="pi pi-send"
-                    style={{ fontSize: '2rem', marginLeft: '10px' }}
+                    style={{ fontSize: '2rem', marginLeft: '15px' }}
                     onClick={handleSendMessage}
                 ></i>
                 <input
