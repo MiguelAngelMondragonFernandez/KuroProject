@@ -44,8 +44,22 @@ export const ChatView = ({idChat, name}) => {
 
     const handleSendMessage = async () => {
         const user = JSON.parse(localStorage.getItem('user'));
+        const data = {
+            "mensaje": message,
+            "fecha": new Date().toISOString().split('T')[0],
+            "url_image": '',
+            "usuario": user.id,
+            "conversacion": idChat
+        }
         if(user)
-            await axios.doGet()
+            await axios.doPost(`mensajes/post/${idChat}/`, data)
+        .then(response => {
+            getMessage();
+            setMessage('');
+        })
+        .catch(error => {
+            console.error('Error al enviar el mensaje:', error);
+        })
     };
 
     const handleSendImage = () => {
@@ -84,10 +98,10 @@ export const ChatView = ({idChat, name}) => {
                     itemSize={50}
                     itemTemplate={itemTemplate}
                     className="border-1 surface-border border-round w-full "
-                    style={{ height: '85vh', overflowY: 'auto' }}
+                    style={{ height: '85vh', overflowY: 'auto', background: "#EEE3CF" }}
                 />
             </div>
-            <div className="flex flex-row" style={{ backgroundColor: 'var(--theme-color)', color: 'var(--text-color)', borderColor: 'var(--text-color)' }} >
+            <div className="flex flex-row p-2" style={{ backgroundColor: 'var(--theme-color)', color: 'var(--text-color)', borderColor: 'var(--text-color)' }} >
                 <i
                     className="pi pi-image"
                     style={{ fontSize: '2rem', marginLeft: '10px', marginRight: '15px' }}
