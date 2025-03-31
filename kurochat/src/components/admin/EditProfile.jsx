@@ -14,34 +14,23 @@ const EditProfile = ({ showModal, setShowModal, formData, handleInputChange, han
     >
       <div className="p-fluid flex flex-column gap-4 mt-3">
         <div>
-          <label htmlFor="nombre" className="font-semibold mb-2">
+          <label htmlFor="first_name" className="font-semibold mb-2">
             Nombre(s):
           </label>
           <InputText
-            id="nombre"
-            value={formData.nombre}
+            id="first_name"
+            value={formData.first_name}
             onChange={handleInputChange}
             className="w-full"
           />
         </div>
         <div>
-          <label htmlFor="apellido_p" className="font-semibold mb-2">
-            Apellido Paterno:
+          <label htmlFor="last_name" className="font-semibold mb-2">
+            Apellidos:
           </label>
           <InputText
-            id="apellido_p"
-            value={formData.apellido_p}
-            onChange={handleInputChange}
-            className="w-full"
-          />
-        </div>
-        <div>
-          <label htmlFor="apellido_m" className="font-semibold mb-2">
-            Apellido Materno:
-          </label>
-          <InputText
-            id="apellido_m"
-            value={formData.apellido_m}
+            id="last_name"
+            value={formData.last_name}
             onChange={handleInputChange}
             className="w-full"
           />
