@@ -20,8 +20,8 @@ function Register() {
         e.preventDefault()
         const Register = {
             "name": name,
-            "apP": apP,
-            "apM": apM,
+            "first_name": apP,
+            "last_name": apM,
             "email": email,
             "password": password === confirmPassword ? password : null,
             "url_photo": urlPhoto
