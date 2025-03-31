@@ -36,7 +36,8 @@ function Login() {
         }
         await axios.doPost('users/login/', data)
         .then(response => {
-            localStorage.setItem('token', response.data.token)
+            const {user} = response.data;  
+            localStorage.setItem('user', JSON.stringify(user));        
             showAlert('success', 'Inicio de sesión exitoso', '¡Bienvenido!')
         }).catch((error) => {
             showAlert('error', 'Error al iniciar sesión', '¡Error!')

@@ -5,6 +5,7 @@ import Register from './auth/Register'
 import NavAdmin from './components/admin/NavAdmin'
 import ProfileAdmin from './components/admin/ProfileAdmin'
 import UsersAdmin from './components/admin/UsersAdmin'
+import View from './Chat/View'
 
 function Router() {
   const location = useLocation();
@@ -20,6 +21,7 @@ function Router() {
         <Route path="/" element={<></>} />
         <Route path="/login" element={<Login />} />
         <Route path='/register' element={<Register />} />
+        <Route path='/prueba' element={<View />} />
 
         <Route path="/admin" element={<NavAdmin />}>
           <Route index element={<UsersAdmin />} />

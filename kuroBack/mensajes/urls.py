@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
-from .views import MensajeViewSet
+from .views import *
 
 router = SimpleRouter()
 
@@ -8,5 +8,6 @@ router.register(r'api', MensajeViewSet)
 from .views import *
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('get/<int:id_conversacion>/', mensajesByIdConversacion.as_view(), name='mensajes_by_id_conversacio'),
 ]

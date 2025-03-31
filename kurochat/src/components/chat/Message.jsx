@@ -1,10 +1,10 @@
 import React, {useState} from 'react'
 
-function Message(message) {
-    const [item, setItem] = useState(message)
+function Message({idUser, message, date}) {
+    const [userId, setUserId] = useState(JSON.parse(localStorage.getItem('user')).id); // Estado para almacenar el ID del usuario autenticado
   return (
-              <div className={`flex flex-row ${item.idUser === 1 ? 'justify-content-start' : 'justify-content-end'}`}>
-                  {item.idUser === 1 && (
+              <div className={`flex flex-row ${idUser === userId ? 'justify-content-start' : 'justify-content-end'}`}>
+                  {idUser === userId && (
                       <div className="col-1">
                           <img
                               src="https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png"
@@ -16,14 +16,14 @@ function Message(message) {
                   <div className="col-11">
                       <div className="flex flex-row">
                           <div className="col-11">
-                              <span>{item.message}</span>
+                              <span>{message}</span>
                           </div>
                           <div className="col-1">
-                              <span>{item.date}</span>
+                              <span>{date}</span>
                           </div>
                       </div>
                   </div>
-                  {item.idUser !== 1 && (
+                  {idUser !== userId && (
                       <div className="col-1">
                           <img
                               src="https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png"

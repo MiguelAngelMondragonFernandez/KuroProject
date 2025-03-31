@@ -37,10 +37,36 @@ class LoginView(APIView):
                         token = cursor.fetchone()
                         is_expired = token[4] < datetime.now()
                         if is_expired:
-                            new_date_expired = datetime.now() + timedelta(minutes=1)
+                            new_date_expired = datetime.now() + timedelta(minutes=100)
                             cursor.execute("UPDATE users_token SET expired = %s WHERE user_id = %s", [new_date_expired, user_id[0]])
                             result = cursor.fetchone()
                         return token[1]
+        except User.DoesNotExist:
+            return None
+    @staticmethod
+    def get_user(email, token):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM users_user WHERE email = %s", [email])
+                user_id = cursor.fetchone()
+                if user_id is None:
+                    return None
+                else:
+                    cursor.execute("SELECT * FROM users_user WHERE id = %s", [user_id[0]])
+                    user = cursor.fetchone()
+                    print(user)
+                    user = {
+                        'id': user[0],
+                        'email': user[1],
+                        'name': user[10],
+                        'first_name': user[3],
+                        'last_name': user[8],
+                        'is_active': user[4],
+                        'is_staff': user[5],
+                        'url_photo': user[9],
+                        'access_token': token,
+                    }
+            return user
         except User.DoesNotExist:
             return None
 
@@ -48,12 +74,15 @@ class LoginView(APIView):
         email = request.data.get('email')
         password = request.data.get('password')
 
-        user = self.auth(email, password)
-
+        token = self.auth(email, password)
+        user = self.get_user(email, token)
         if user is None:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if token is None:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         else:
-            return Response({'token': user}, status=status.HTTP_200_OK)
+            return Response({'user': user}, status=status.HTTP_200_OK)
 
 class RegisterView(APIView):
     def post(self, request):

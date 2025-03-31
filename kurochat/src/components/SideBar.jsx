@@ -11,10 +11,19 @@ function SideBar({ asignarIdChat }) {
 
     const fetchChats = async () => {
         try {
-            const response = await axios.doGet('chats'); 
-            setFriends(response.data); 
+        const user = JSON.parse(localStorage.getItem("user"));
+            await axios.doGet(`conversaciones/get/${user.id}/`)
+            .then(response => {
+                const {conversaciones} = response.data;
+                console.log(conversaciones);
+                
+                setFriends(conversaciones);
+                
+            })
+            .catch( error => {
+                console.error("Error al obtener los chats:", error);
+            })
         } catch (error) {
-            console.error("Error al obtener los chats:", error);
         }
     };
     
@@ -28,15 +37,15 @@ function SideBar({ asignarIdChat }) {
             <div
                 className="flex p-3 cursor-pointer hover:bg-gray-800 rounded-lg"
                 style={{ background: "var(--theme-color)", color: "var(--text-color)" }}
-                onClick={() => asignarIdChat(item.usuario_id)}
+                onClick={() => asignarIdChat(item.id, item.nombre_conversacion)}
             >
                 <img
-                    src={item.url_imagen}
-                    alt={item.name}
-                    className="w-2 h-2 rounded-full object-cover mt-1"
+                    src={item.url_photo}
+                    alt={item.nombre_conversacion}
+                    className="w-3 h-full rounded-full object-cover mt-1"
                 />
                 <div className="ml-3">
-                    <div className="font-bold text-white">{item.name}</div>
+                    <div className="font-bold text-white">{item.nombre_conversacion}</div>
                     <div className="text-sm text-gray-400">{item.ultimo_mensaje}</div>
                 </div>
             </div>
@@ -64,7 +73,7 @@ function SideBar({ asignarIdChat }) {
                             ) : (
                                 <VirtualScroller
                                 itemSize={100}
-                                style={{ width: '30%', height: '500px' }}
+                                style={{ width: '100%', height: '87vh' }}
                                 items={friends}
                                 itemTemplate={itemTemplate}
                             />
