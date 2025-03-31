@@ -4,13 +4,14 @@
         "changeColor": "Cambiar Color",
         "profile": "Perfil",
         "settings": "Ajustes",
-        "chats": "Chats",
+        "chats": "Conversaciones",
         "logOut":"Cerrar Sesión",
         "search":"Buscar",
         "addFriend":"Agregar Amigo",
         "friendsEmail":"Correo del Amigo",
         "add":"Agregar",
-        "cancelacion":"Cancelar"
+        "cancelacion":"Cancelar",
+        "online": "En Línea"
     },
     "en": {
         "changeLanguage": "Change Language",
@@ -23,6 +24,7 @@
         "addFriend":"Add Friend",
         "friendsEmail":"Friend's Email",
         "add":"Add",
-        "cancelacion":"Cancel"
+        "cancelacion":"Cancel",
+        "online": "Online"
     }
 }

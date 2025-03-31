@@ -1,16 +1,95 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { ColorPicker } from 'primereact/colorpicker';
 import { LanguageContext } from './LanguageContext';
 import { useTheme } from '../utils/ThemeContext';
+import axios from "../utils/httpgateway"
 
 function Settings() {
+    const USUARIO_ID = 1; 
+
     const languages = [
         { name: "Español", code: "es", flag: "https://flagcdn.com/w40/es.png" },
         { name: "Inglés", code: "en", flag: "https://flagcdn.com/w40/gb.png" },
     ];
     const { translations, language, changeLanguage } = useContext(LanguageContext);
+    const [loading, setLoading] = useState(false);
     const { themeColor, textColor, changeThemeColor } = useTheme();
+    const toast = useRef(null);
+
+    const getConfiguracion = async () => {
+        // metodo pendiente porque el get id me lo bloquea por el CORS, pero funciona sin problema esta parte
+        try {
+            setLoading(true);
+            
+            const token = localStorage.getItem('token');
+            
+            const response = await axios.doGet(`configuracionesaplicacion/api/${USUARIO_ID}`);
+            const configData = response.data[0];
+            console.log(configData)
+            
+            if (configData) {
+                changeThemeColor(configData.colorPricipal);
+                changeLanguage(configData.idioma);
+                setLoading(false);
+            } else {
+                console.error('No se encontró la configuración del usuario');
+                setLoading(false);
+            }
+        } catch (err) {
+            console.error('Error al obtener la configuración:', err);
+            setLoading(false);
+        }
+    }
+
+    const showSuccessToast = (message) => {
+        if (toast.current) {
+            toast.current.show({ 
+                severity: 'success', 
+                summary: 'Éxito', 
+                detail: message, 
+                life: 3000 
+            });
+        }
+    };
+
+    const showErrorToast = (message) => {
+        if (toast.current) {
+            toast.current.show({ 
+                severity: 'error', 
+                summary: 'Error', 
+                detail: message, 
+                life: 3000 
+            });
+        }
+    };
+
+    const saveConfiguracion = async (configData) => {
+        try {
+            setLoading(true);
+            
+            const configToSave = {
+                colorPricipal: themeColor,
+                tema: 'light',
+                idioma: language,
+                usuario: USUARIO_ID,
+                ...configData
+            };
+            
+            const token = localStorage.getItem('token');
+            
+            await axios.doPut(`configuracionesaplicacion/api/${USUARIO_ID}`, configToSave)
+            
+            showSuccessToast('Configuración guardada con éxito');
+            setLoading(false);
+        } catch (err) {
+            console.error('Error al guardar la configuración:', err);
+            showErrorToast('Error al guardar la configuración');
+            setLoading(false);
+        }
+    };
+
+   
 
     const languageTemplate = (option) => {
         if (!option || !option.flag) return null;
@@ -23,7 +102,15 @@ function Settings() {
     };
 
     const handleColorChange = (e) => {
-        changeThemeColor(e.value);
+        const newColor = '#' + e.value;
+        changeThemeColor(newColor);
+        saveConfiguracion({ colorPricipal: newColor });
+    };
+
+    const handleLanguageChange = (e) => {
+        const newLanguage = e.value.code;
+        changeLanguage(newLanguage);
+        saveConfiguracion({ idioma: newLanguage });
     };
 
     return (
@@ -43,7 +130,7 @@ function Settings() {
                             <Dropdown
                                 value={languages.find((l) => l.code === language)}
                                 options={languages}
-                                onChange={(e) => changeLanguage(e.value.code)}
+                                onChange={handleLanguageChange}
                                 optionLabel="name"
                                 placeholder="Seleccione un idioma"
                                 itemTemplate={languageTemplate}
@@ -64,7 +151,7 @@ function Settings() {
                 <div className='flex flex-column border-[var(--text-color)] border-bottom-1 p-3'>
                     <div className='flex'>
                         <i className="pi pi-palette" style={{ fontSize: '2rem' }} />
-                        <span className="ml-3">Cambiar de color</span>
+                        <span className="ml-3">{translations.changeColor}</span>
                     </div>
                     <div className="w-full h-16 flex flex-grow items-center gap-2">
                         <ColorPicker

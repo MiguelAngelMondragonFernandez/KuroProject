@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { VirtualScroller } from 'primereact/virtualscroller';
 import Settings from './Settings';
-import { LanguageProvider } from './LanguageContext';
+import { LanguageProvider, LanguageContext } from './LanguageContext';
 
 function SideBar({ asignarIdChat }) {
+    const { translations } = useContext(LanguageContext);
     const [friends, setFriends] = useState([{}])
     const [isMounted, setIsMounted] = useState(false)
     const [state, setState] = useState("listChats")
@@ -56,20 +57,21 @@ function SideBar({ asignarIdChat }) {
                 <img src={item.avatar} alt={item.name} className="w-10 h-10 rounded-full" />
                 <div className="flex flex-col">
                     <span>{item.name}</span>
-                    <span>Online</span>
+                    <span>{translations.online}</span>
                 </div>
             </div>
         )
     }
     return (
         <>
+        <LanguageProvider>
             {
                 state === "listChats" ? (
                     <>
                         <div className="flex flex-col"   style={{background:"var(--theme-color)" ,color:"Var(--text-color)"}}>
                             <div className="grid">
                                 <div className="col-6 flex flex-row">
-                                    <h3>Chats</h3>
+                                    <h3>{translations.chats}</h3>
                                 </div>
                                 <div className="col-6 flex flex-row">
                                     <i className="pi pi-cog hover:bg-blue-50" style={{ fontSize: '2rem' }} onClick={() => setState("config")}></i>
@@ -87,11 +89,10 @@ function SideBar({ asignarIdChat }) {
                         </div>
                     </>
                 ) : (
-                    <LanguageProvider>
                         <Settings />
-                    </LanguageProvider>
                 )
             }
+        </LanguageProvider>
         </>
     )
 }
