@@ -4,12 +4,13 @@ import axios from "axios";
 const instance = axios.create({
     headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
     }
 });
 
 instance.interceptors.request.use(
     async (config) => {
-        return config;
+         return config;
     }
 );
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button } from "primereact/button";
 import Swal from "sweetalert2";
 import Leveling from '../../assets/img/solo.png';
@@ -6,9 +6,11 @@ import { Image } from 'primereact/image';
 import { useNavigate } from "react-router-dom";
 import EditProfile from "./EditProfile";
 import '../../admin.css'
+import { AuthContext } from "../../auth/AuthContext";
 
 const ProfileAdmin = () => {
   const [showModal, setShowModal] = useState(false);
+  const { token, logout } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     nombre: "Miguel",
     apellido_p: "Moreno",
@@ -62,6 +64,7 @@ const ProfileAdmin = () => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
+        logout();
         navigate("/login"); 
       }
     });
@@ -69,13 +72,13 @@ const ProfileAdmin = () => {
 
   return (
     <div className="p-5">
-      <h1 className="text-center text-3xl font-bold mb-5">Perfil del Administrador</h1>
+      <h1 className="text-center text-3xl font-bold mb-5 text-color-custom">Perfil del Administrador</h1>
       <div className="flex flex-column align-items-center gap-5">
         <div className="flex flex-column align-items-center">
           <div className="circle-container-admin">
             <Image src={Leveling} zoomSrc={Leveling} alt="Image" className="circle-admin" preview />
           </div>
-          <h2 className="text-2xl font-semibold mt-3">{`${formData.nombre} ${formData.apellido_p} ${formData.apellido_m}`}</h2>
+          <h2 className="text-2xl font-semibold mt-3 text-color-custom">{`${formData.nombre} ${formData.apellido_p} ${formData.apellido_m}`}</h2>
           <p className="text-gray-600 mt-2 text-xl">{formData.email}</p>
         </div>
         <div className="flex justify-content-center gap-4">

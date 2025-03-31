@@ -1,11 +1,9 @@
 import React from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Menubar } from 'primereact/menubar';
-import { Button } from 'primereact/button';
-import LogoKuro from '../../assets/img/KuroLogo.png';
-import Users from "./UsersAdmin";
-import ProfileAdmin from "./ProfileAdmin";
-import '../../admin.css'
+import { Menubar } from "primereact/menubar";
+import { Button } from "primereact/button";
+import LogoKuro from "../../assets/img/KuroLogo.png";
+import "../../admin.css";
 
 function NavAdmin() {
   const navigate = useNavigate();
@@ -13,43 +11,46 @@ function NavAdmin() {
 
   const items = [
     {
-      label: 'Usuarios',
-      icon: 'pi pi-users',
+      label: "Usuarios",
+      icon: "pi pi-users",
       command: () => {
-        navigate("/Admin");
+        navigate("/admin");
       },
-      className: "text-white font-normal hover:text-black hover:font-bold hover:bg-black hover:bg-opacity-10"
+      className: location.pathname === "/admin" 
+        ? "nav-item-selected" 
+        : "nav-item"
     },
   ];
 
   const start = (
-    <NavLink to="/Admin" className={`flex items-center gap-2 text-white`}>
+    <div className="flex items-center justify-center space-x-3 cursor-pointer" onClick={() => navigate("/admin")}>
       <img alt="logo" src={LogoKuro} width="50" height="40" />
-      <span className="font-serif text-2xl font-bold text-center flex align-items-center justify-content-center">KuroChat</span>
-    </NavLink>
+      <span className="font-serif text-2xl font-bold text-center flex-1">KuroChat</span>
+    </div>
   );
 
   const end = (
     <Button
       label="Miguel Moreno"
       icon="pi pi-user"
-      className="p-button-rounded p-button-text"
-      onClick={() => navigate("/Perfil")}
+      className={`profile-button ${
+        location.pathname === "/admin/perfil" ? "profile-button-selected" : ""
+      }`}
+      onClick={() => navigate("/admin/perfil")}
     />
   );
 
   return (
-    <div className="w-screen h-auto">
-      <Menubar model={items} start={start} end={end} className="menubar-custom flex justify-between"
-        pt={{
-          label: { className: "text-white font-normal " },
-          icon: { className: "text-white font-normal " },
-        }}
+    <div>
+      <Menubar
+        model={items}
+        start={start}
+        end={end}
+        className="menubar-custom fixed top-0 left-0 w-full z-10 bg-black text-white"
       />
 
-      <main className="flex-grow flex flex-col items-center justify-center">
-        <section className="w-full h-full p-2">
-          {location.pathname === "/Perfil" ? <ProfileAdmin /> : <Users />}
+      <main className="flex-grow flex flex-col items-center justify-center mt-7 mb-5">
+        <section className="w-full h-auto px-4">
           <Outlet />
         </section>
       </main>
