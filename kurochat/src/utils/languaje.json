@@ -1,0 +1,28 @@
+{
+    "es": {
+        "changeLanguage": "Cambiar Idioma",
+        "changeColor": "Cambiar Color",
+        "profile": "Perfil",
+        "settings": "Ajustes",
+        "chats": "Chats",
+        "logOut":"Cerrar Sesión",
+        "search":"Buscar",
+        "addFriend":"Agregar Amigo",
+        "friendsEmail":"Correo del Amigo",
+        "add":"Agregar",
+        "cancelacion":"Cancelar"
+    },
+    "en": {
+        "changeLanguage": "Change Language",
+        "changeColor": "Change Color",
+        "profile": "Profile",
+        "settings": "Settings",
+        "chats": "Chats",
+        "logOut":"Log Out",
+        "search":"Search",
+        "addFriend":"Add Friend",
+        "friendsEmail":"Friend's Email",
+        "add":"Add",
+        "cancelacion":"Cancel"
+    }
+}
