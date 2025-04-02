@@ -198,3 +198,23 @@ class Reset(APIView):
             return Response(
                 {"message": "Password updated successfully"}, status=status.HTTP_200_OK
             )
+
+class GetUserByEmail(APIView):
+
+    def get(self, request, email):
+        print(request.headers)
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT id, email, name FROM users_user WHERE email = %s", [email])
+                user = cursor.fetchone()
+                if user is None:
+                    return Response({'error': 'Usuario no encontrado.'}, status=404)
+
+                user_data = {
+                    'id': user[0],
+                    'email': user[1],
+                    'name': user[2],
+                }
+                return Response(user_data, status=200)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
