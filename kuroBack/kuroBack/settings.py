@@ -65,6 +65,8 @@ ROOT_URLCONF = 'kuroBack.urls'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://192.168.111.241:5173",
+    "http://127.0.0.1:5173",
 ]
 
 
@@ -143,3 +145,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+#Configuración para Gmail
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+# Usar su correo de UTEZ
+EMAIL_HOST_USER = "20223tn026+Reopeko@utez.edu.mx"
+# Obtener de https://myaccount.google.com/apppasswords
+EMAIL_HOST_PASSWORD = "euue qubr qlwu zlik"

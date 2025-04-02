@@ -6,4 +6,4 @@ from users.permissions import IsTokenValid
 class ConfiguracionesAplicacionViewSet(viewsets.ModelViewSet):
     queryset = ConfiguracionAplicacion.objects.all()
     serializer_class = ConfiguracionAplicacionSerializer
-    pagination_class = [IsTokenValid]
+    permission_classes = [IsTokenValid]

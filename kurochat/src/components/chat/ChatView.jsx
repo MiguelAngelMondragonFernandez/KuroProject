@@ -3,40 +3,40 @@ import { VirtualScroller } from 'primereact/virtualscroller';
 import { InputText } from 'primereact/inputtext';
 import Message from './Message';
 import axios from '../../utils/httpgateway';
+import * as a from 'axios';
 
-export const ChatView = () => {
+export const ChatView = ({idChat, name}) => {
+    const [isMounted, setIsMounted] = useState(false);
     const [items, setItems] = useState([]);
     const [message, setMessage] = useState('');
     const [userId, setUserId] = useState(null); // Estado para almacenar el ID del usuario autenticado
+    const [file, setFile] = useState(null); // Estado para almacenar el archivo seleccionado
     const fileInputRef = useRef(null);
     const virtualScrollerRef = useRef(null);
+    const [heartBeat, setHeartBeat] = useState(name);
 
-    // Obtener el ID del usuario autenticado
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const response = await axios.doGet('auth/user/'); 
-                setUserId(response.data.idUser); 
-            } catch (error) {
-                console.error('Error al obtener el usuario autenticado:', error);
-            }
-        };
-
-        fetchUser();
-    }, []);
 
     const getMessage = async () => {
         try {
-            const response = await axios.doGet('mensajes/api/');
-            setItems(response.data); 
+            await axios.doGet('mensajes/get/'+idChat+'/')
+            .then(response => {
+                const { mensajes } = response.data;
+                setItems(mensajes);
+                setHeartBeat(name)
+                
+            })
         } catch (error) {
             console.error('Error al obtener mensajes:', error);
         }
     };
 
     useEffect(() => {
+        setIsMounted(true);
+    },[])
+
+    useEffect(() => {
         getMessage();
-    }, []);
+    }, [isMounted, idChat]);
 
     useEffect(() => {
         if (virtualScrollerRef.current) {
@@ -45,21 +45,41 @@ export const ChatView = () => {
     }, [items]);
 
     const handleSendMessage = async () => {
-        if (message.trim() !== '' && userId) {
-            const newMessage = {
-                idUser: userId, 
-                message: message,
-                date: new Date().toISOString(),
-            };
+        const user = JSON.parse(localStorage.getItem('user'));
 
-            try {
-                const response = await axios.doPost('mensajes/api/', newMessage);
-                setItems((prevItems) => [...prevItems, response.data]); 
-                setMessage(''); // Limpia el input
-            } catch (error) {
-                console.error('Error al enviar mensaje:', error);
+        const form = new FormData();
+        form.append('file', file);
+        fetch('http://localhost:4000/upload', {
+            method: 'POST',
+            body: form,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status != 200){
+                console.error('Error al subir el archivo:', data.message);
             }
+            else {
+                const dataMessage = {
+                    "mensaje": message,
+                    "fecha": new Date().toISOString().split('T')[0],
+                    "url_image": data.path,
+                    "usuario": user.id,
+                    "conversacion": idChat
+                }
+                axios.doPost(`mensajes/post/${idChat}/`, dataMessage    )
+                .then(() => {
+                    getMessage();
+                    setMessage('');
+                })
+                .catch(error => {
+                    console.error('Error al enviar el mensaje:', error);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error al subir el archivo:', error);
         }
+    )
     };
 
     const handleSendImage = () => {
@@ -70,18 +90,22 @@ export const ChatView = () => {
         const file = event.target.files[0];
         if (file) {
             console.log('Archivo seleccionado:', file);
+            setFile(file); // Actualizar el estado con el archivo seleccionado
             
         }
     };
 
     const itemTemplate = (item) => {
         if (!item) return null;
+        console.log(item);
+        
 
         return (
             <Message
-                idUser={item.idUser}
-                message={item.message}
-                date={item.date}
+                idUser={item.user}
+                message={item.mensaje}
+                date={item.fecha}
+                img={item.url_photo}
             />
         );
     };
@@ -89,37 +113,35 @@ export const ChatView = () => {
     return (
         <>
             <div className="flex flex-row " style={{background:"var(--theme-color)" ,color:"Var(--text-color)"}} >
-                <p>nombre de la persona</p>
+                <p>{heartBeat}</p>
             </div>
-            <div className="card flex justify-content-center"  style={{background:"var(--theme-color)" ,color:"Var(--text-color)"}}>
+            <div className="flex justify-content-center"  style={{background:"var(--theme-color)" ,color:"Var(--text-color)"}}>
                 <VirtualScroller
                     ref={virtualScrollerRef}
                     items={items}
                     itemSize={50}
                     itemTemplate={itemTemplate}
-                    className="border-1 surface-border border-round w-full h-screen "
+                    className="border-1 surface-border border-round w-full "
+                    style={{ height: '85vh', overflowY: 'auto', background: "#EEE3CF" }}
                 />
             </div>
-                    className="border-1 surface-border border-round w-full h-screen"
-                    style={{ backgroundColor: '#EEE3CF' ,color:"Var(--text-color)" }}
-                />
-            </div>
-            <div className="flex flex-row">
+            <div className="flex flex-row p-2" style={{ backgroundColor: 'var(--theme-color)', color: 'var(--text-color)', borderColor: 'var(--text-color)' }} >
                 <i
                     className="pi pi-image"
                     style={{ fontSize: '2rem', marginLeft: '10px', marginRight: '15px' }}
                     onClick={handleSendImage}
+                    onChange={(e) => setFile(e.target.files[0])}
                 ></i>
                 <InputText
                     placeholder="Escribe tu mensaje"
                     className="w-full"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    style={{ backgroundColor: 'var(--theme-color)', color: 'var(--text-color)', borderColor: 'var(--text-color)' }} 
+                   style={{background: 'transparent'}}
                 />
                 <i
                     className="pi pi-send"
-                    style={{ fontSize: '2rem', marginLeft: '15px' }}
+                    style={{ fontSize: '2rem', marginLeft: '10px' }}
                     onClick={handleSendMessage}
                 ></i>
                 <input

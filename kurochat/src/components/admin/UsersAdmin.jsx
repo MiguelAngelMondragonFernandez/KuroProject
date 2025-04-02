@@ -192,11 +192,7 @@ function UsersAdmin() {
         last_name: formData.last_name,
         email: formData.email,
         password: password,
-        url_photo: formData.url_photo || "", 
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        url_photo: formData.url_photo || "",
       });
   
       setUsers((prevUsers) => [...prevUsers, response.data]);

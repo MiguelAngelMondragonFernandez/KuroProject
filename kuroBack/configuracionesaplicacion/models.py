@@ -9,4 +9,4 @@ class ConfiguracionAplicacion(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.usuario
+        return self.id
