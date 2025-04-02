@@ -18,7 +18,7 @@ function View() {
         idChat ? (
           <div className="flex flex-column col-9"><ChatView idChat={idChat} name={nameChat} /></div>
         ) : (
-          <div className="flex flex-column col-9 bg-blue-50 text-red-500" style={{width: '100vh'}}> Hello Unhappy</div>
+          <div className="flex flex-column col-9 " style={{width: '100vh'}}> No hay un chat seleccionado</div>
         )
       }
    

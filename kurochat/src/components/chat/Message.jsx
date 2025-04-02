@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function Message({ idUser, message, date }) {
+function Message({ idUser, message, date, img }) {
     const [userId] = useState(JSON.parse(localStorage.getItem('user')).id);
 
     const containerStyle = {

@@ -6,6 +6,8 @@ import NavAdmin from './components/admin/NavAdmin'
 import ProfileAdmin from './components/admin/ProfileAdmin'
 import UsersAdmin from './components/admin/UsersAdmin'
 import View from './Chat/View'
+import RecoveryPassword from './auth/RecoveryPassword'
+import ResetPassword from './auth/ResetPassword'
 
 function Router() {
   const location = useLocation();
@@ -21,7 +23,9 @@ function Router() {
         <Route path="/" element={<></>} />
         <Route path="/login" element={<Login />} />
         <Route path='/register' element={<Register />} />
-        <Route path='/prueba' element={<View />} />
+        <Route path='/recovery' element={<RecoveryPassword />} />
+        <Route path='/reset/:token' element={<ResetPassword />} />
+        <Route path='/chats' element={<View />} />
 
         <Route path="/admin" element={<NavAdmin />}>
           <Route index element={<UsersAdmin />} />

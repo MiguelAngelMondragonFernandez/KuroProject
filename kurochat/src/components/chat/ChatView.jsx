@@ -3,12 +3,14 @@ import { VirtualScroller } from 'primereact/virtualscroller';
 import { InputText } from 'primereact/inputtext';
 import Message from './Message';
 import axios from '../../utils/httpgateway';
+import * as a from 'axios';
 
 export const ChatView = ({idChat, name}) => {
     const [isMounted, setIsMounted] = useState(false);
     const [items, setItems] = useState([]);
     const [message, setMessage] = useState('');
     const [userId, setUserId] = useState(null); // Estado para almacenar el ID del usuario autenticado
+    const [file, setFile] = useState(null); // Estado para almacenar el archivo seleccionado
     const fileInputRef = useRef(null);
     const virtualScrollerRef = useRef(null);
     const [heartBeat, setHeartBeat] = useState(name);
@@ -44,22 +46,40 @@ export const ChatView = ({idChat, name}) => {
 
     const handleSendMessage = async () => {
         const user = JSON.parse(localStorage.getItem('user'));
-        const data = {
-            "mensaje": message,
-            "fecha": new Date().toISOString().split('T')[0],
-            "url_image": '',
-            "usuario": user.id,
-            "conversacion": idChat
-        }
-        if(user)
-            await axios.doPost(`mensajes/post/${idChat}/`, data)
-        .then(response => {
-            getMessage();
-            setMessage('');
+
+        const form = new FormData();
+        form.append('file', file);
+        fetch('http://localhost:4000/upload', {
+            method: 'POST',
+            body: form,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status != 200){
+                console.error('Error al subir el archivo:', data.message);
+            }
+            else {
+                const dataMessage = {
+                    "mensaje": message,
+                    "fecha": new Date().toISOString().split('T')[0],
+                    "url_image": data.path,
+                    "usuario": user.id,
+                    "conversacion": idChat
+                }
+                axios.doPost(`mensajes/post/${idChat}/`, dataMessage    )
+                .then(() => {
+                    getMessage();
+                    setMessage('');
+                })
+                .catch(error => {
+                    console.error('Error al enviar el mensaje:', error);
+                });
+            }
         })
         .catch(error => {
-            console.error('Error al enviar el mensaje:', error);
-        })
+            console.error('Error al subir el archivo:', error);
+        }
+    )
     };
 
     const handleSendImage = () => {
@@ -70,18 +90,22 @@ export const ChatView = ({idChat, name}) => {
         const file = event.target.files[0];
         if (file) {
             console.log('Archivo seleccionado:', file);
+            setFile(file); // Actualizar el estado con el archivo seleccionado
             
         }
     };
 
     const itemTemplate = (item) => {
         if (!item) return null;
+        console.log(item);
+        
 
         return (
             <Message
                 idUser={item.user}
                 message={item.mensaje}
                 date={item.fecha}
+                img={item.url_photo}
             />
         );
     };
@@ -106,6 +130,7 @@ export const ChatView = ({idChat, name}) => {
                     className="pi pi-image"
                     style={{ fontSize: '2rem', marginLeft: '10px', marginRight: '15px' }}
                     onClick={handleSendImage}
+                    onChange={(e) => setFile(e.target.files[0])}
                 ></i>
                 <InputText
                     placeholder="Escribe tu mensaje"

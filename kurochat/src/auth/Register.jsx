@@ -2,7 +2,8 @@ import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
 import axios from '../utils/httpgateway'
 import React from 'react'
-
+import { useNavigate } from 'react-router-dom'
+import { showAlert } from '../utils/alerts'
 function Register() {
 
     const [showPassword, setShowPassword] = React.useState('password')
@@ -14,6 +15,7 @@ function Register() {
     const [apM, setApM] = React.useState('')
     const [email, setEmail] = React.useState('')
     const [urlPhoto, setUrlPhoto] = React.useState('')
+    const navigate = useNavigate()
 
 
     const SetRegister = async (e) => {
@@ -28,10 +30,15 @@ function Register() {
         }
         await axios.doPost('users/register/', Register)
             .then(response => {
-                console.log(response)
+                showAlert('success', 'Registro exitoso', '¡Bienvenido!')
+                setTimeout(() => {
+                navigate('/login');
+                }, 2000);
             }
             )
-            .catch(error => console.error(error))
+            .catch(error => 
+                showAlert('error', 'Error al registrar', '¡Error!')
+            )
     }
 
     const inputStyle = "w-full"

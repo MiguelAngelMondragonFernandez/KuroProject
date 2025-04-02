@@ -10,4 +10,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
+    path('recovery/', SendMail.as_view(), name='recovery'),
+    path('reset/<str:token>/', Reset.as_view(), name='reset'),
 ]
