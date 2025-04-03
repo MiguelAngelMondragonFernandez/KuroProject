@@ -137,7 +137,7 @@ class SendMail(APIView):
                     {"error": "Token not found"}, status=status.HTTP_404_NOT_FOUND
                 )
             token = token[0]
-            reset_link = f"http://localhost:5173/resey/{token}"
+            reset_link = f"http://localhost:5173/reset/{token}"
 
             # Envio de correo
             send_mail(

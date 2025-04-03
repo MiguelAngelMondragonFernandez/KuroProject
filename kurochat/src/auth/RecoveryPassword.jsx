@@ -8,13 +8,11 @@ function RecoveryPassword() {
 
 const [mail, setMail] = React.useState('')
 const sendMail = async() => {
-    console.log(mail);
     
     if(mail) {
         showAlert('loading', 'Enviando correo de recuperación...', 0)
         await axios.doPost('users/recovery/', { email: mail })
         .then((response) => {
-            console.log(response)
             if(response.status === 200) {
                 showAlert('success', 'Correo enviado', 'Revisa tu bandeja de entrada para restablecer tu contraseña.')
             } else {
