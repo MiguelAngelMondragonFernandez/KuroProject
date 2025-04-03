@@ -61,9 +61,10 @@ function Login() {
 
 
     return (
-        <div className="flex flex-col justify-content-center align-items-center h-screen p-5 text-white">
-            <div className="shadow-lg rounded-lg p-6 w-5 max-w-md">
-                <h1 className="text-2xl font-bold text-center mb-4">Login</h1>
+        <div className="flex flex-col justify-content-center align-items-center h-screen p-5 text-white"
+            style={{ backgroundColor: "#F2E1C2" }}>
+            <div className="shadow-lg rounded-lg p-6 w-5 max-w-md bg-gray-900 border border-round-xl">
+                <h1 className="text-2xl font-bold text-center mb-4">Bienvenido</h1>
 
                 <div className="mb-4">
                     <label>Correo Electrónico:</label>
@@ -92,6 +93,7 @@ function Login() {
                         <Button
                             onClick={() => setTypeInput(typeInput === "password" ? "text" : "password")}
                             icon={typeInput === "password" ? "pi pi-eye" : "pi pi-eye-slash"}
+                            className="absolute right-2 top-1 bg-transparent border-none text-white hover:text-gray-300"
                         />
                     </div>
                     {validPassword && (
@@ -99,12 +101,23 @@ function Login() {
                     )}
                 </div>
 
+                <div className="flex justify-content-center align-items-center">
                 <Button
                     label="Login"
-                    className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
+                    className="bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                     onClick={SetLogin}
                     disabled={validForm}
                 />
+                </div>
+
+                <div className="flex flex-column justify-content-center align-items-center mt-4">
+                    <a href="/recovery" className="text-white hover:text-blue-700">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                    <a href="/register" className="text-white hover:text-blue-700">
+                        ¿No tienes una cuenta? Regístrate
+                    </a>
+                    </div>
             </div>
         </div>
     );

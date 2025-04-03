@@ -15,13 +15,10 @@ const [token, setToken] = React.useState(useParams().token)
 
 
 const resetPassword = async() => {
-    console.log(password);
-    console.log(token);
     
     await axios.doPost('users/reset/'+token+'/', {password})
     .then(
         (response) => {
-            console.log(response)
             if(response.status === 200) {
                 showAlert('success', 'Contraseña restablecida', 'Tu contraseña ha sido restablecida con éxito.')
                 navigate('/login')

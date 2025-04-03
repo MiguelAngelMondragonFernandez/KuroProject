@@ -4,7 +4,6 @@ from datetime import datetime
 
 class IsTokenValid(BasePermission):
     def has_permission(self, request, view):
-        if request.method == 'GET':
             header = request.headers.get('Authorization')
             if header is not None:
                 token = header.split(' ')[1]
@@ -22,6 +21,3 @@ class IsTokenValid(BasePermission):
                         else:
                             
                             return True
-            else:
-                self.detail = 'Token not found'
-                return False

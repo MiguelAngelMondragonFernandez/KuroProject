@@ -4,7 +4,6 @@ import Settings from './Settings';
 import { LanguageProvider } from './LanguageContext';
 import axios from '../utils/httpgateway';
 import AddUser from './AddUser';
-
 function SideBar({ asignarIdChat }) {
     const [friends, setFriends] = useState([])
     const [isMounted, setIsMounted] = useState(false)
@@ -17,8 +16,6 @@ function SideBar({ asignarIdChat }) {
             await axios.doGet(`conversaciones/get/${user.id}/`)
             .then(response => {
                 const {conversaciones} = response.data;
-                console.log(conversaciones);
-                
                 setFriends(conversaciones);
                 
             })
@@ -39,16 +36,17 @@ function SideBar({ asignarIdChat }) {
     };
 
     const itemTemplate = (item) => {
-        return (
+                return (
             <div
-                className="flex p-3 cursor-pointer hover:bg-gray-800 rounded-lg"
+                className="flex p-3 cursor-pointer hover:bg-gray-800"
                 style={{ background: "var(--theme-color)", color: "var(--text-color)" }}
                 onClick={() => asignarIdChat(item.id, item.nombre_conversacion)}
             >
                 <img
                     src={item.url_photo}
                     alt={item.nombre_conversacion}
-                    className="w-3 h-full rounded-full object-cover mt-1"
+                    className="border-circle"
+                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                 />
                 <div className="ml-3">
                     <div className="font-bold text-white">{item.nombre_conversacion}</div>

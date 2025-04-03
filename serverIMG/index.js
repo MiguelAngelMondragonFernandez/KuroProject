@@ -7,7 +7,7 @@ const app = express();
 
 // Habilitar CORS antes de definir las rutas
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173'], // Agrega los dominios permitidos
+  origin: ['http://localhost:4000', 'http://localhost:5173'], // Agrega los dominios permitidos
   methods: ['POST'],
   allowedHeaders: ['Content-Type']
 }));
@@ -15,14 +15,15 @@ app.use(cors({
 // Middleware para manejar JSON (por si en el futuro lo necesitas)
 app.use(express.json());
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: '../kurochat/public/uploads/' });
 
 // Función para guardar la imagen correctamente
 const saveImage = (file) => {
   try {
-    const newPath = `./uploads/${file.originalname}`;
+    const newPath = `../kurochat/public/uploads/${file.originalname}`;
+    const returnPath = `/uploads/${file.originalname}`;
     fs.renameSync(file.path, newPath);
-    return newPath;
+    return returnPath;
   } catch (error) {
     console.error('Error al guardar la imagen:', error);
     return null;

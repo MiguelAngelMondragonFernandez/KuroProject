@@ -30,7 +30,7 @@ const AddUser = ({ onClose, onAddUser }) => {
                 emails
                     .filter(email => email.trim() !== userEmail)
                     .map(async (email) => {
-                        const response = await axios.doGet(`users/getByEmail/${email.trim()}`);
+                        const response = await axios.doGet(`users/getByEmail/${email.trim()}/`);
                         return response.data.id;
                     })
             );
