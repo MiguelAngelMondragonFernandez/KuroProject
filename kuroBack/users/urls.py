@@ -12,4 +12,5 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('recovery/', SendMail.as_view(), name='recovery'),
     path('reset/<str:token>/', Reset.as_view(), name='reset'),
+    path('getByEmail/<str:email>/', GetUserByEmail.as_view(), name='get_user_by_email'),
 ]

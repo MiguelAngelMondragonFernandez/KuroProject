@@ -3,11 +3,13 @@ import { VirtualScroller } from 'primereact/virtualscroller';
 import Settings from './Settings';
 import { LanguageProvider } from './LanguageContext';
 import axios from '../utils/httpgateway';
+import AddUser from './AddUser';
 
 function SideBar({ asignarIdChat }) {
     const [friends, setFriends] = useState([])
     const [isMounted, setIsMounted] = useState(false)
     const [state, setState] = useState("listChats")
+    const [showAddUserModal, setShowAddUserModal] = useState(false)
 
     const fetchChats = async () => {
         try {
@@ -31,6 +33,10 @@ function SideBar({ asignarIdChat }) {
     useEffect(() => {
         fetchChats();
     }, []);
+
+    const handleAddUser = (newChat) => {
+        setFriends((prevFriends) => [...prevFriends, newChat]); 
+    };
 
     const itemTemplate = (item) => {
         return (
@@ -63,7 +69,7 @@ function SideBar({ asignarIdChat }) {
                                 </div>
                                 <div className="col-6 flex flex-row align-items-center ">
                                     <i className="pi pi-cog hover:text-blue-400 cursor-pointer" style={{ fontSize: '2rem' }} onClick={() => setState("config")}></i>
-                                    <i className="pi pi-comment  hover:text-blue-400 cursor-pointer" style={{ fontSize: '2rem' }} onClick={() => setState("addChat")}></i>
+                                    <i className="pi pi-comment  hover:text-blue-400 cursor-pointer" style={{ fontSize: '2rem' }} onClick={() => setShowAddUserModal(true)}></i>
                                 </div>
                             </div>
                         </div>
@@ -79,6 +85,38 @@ function SideBar({ asignarIdChat }) {
                             />
                             )}
                         </div>
+                        {showAddUserModal && (
+                            <div
+                                style={{
+                                    position: 'fixed',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    zIndex: 50,
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        backgroundColor: 'black',
+                                        padding: '20px',
+                                        borderRadius: '8px',
+                                        maxWidth: '400px',
+                                        width: '100%',
+                                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                    }}
+                                >
+                                    <AddUser
+                                        onClose={() => setShowAddUserModal(false)}
+                                        onAddUser={handleAddUser}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </>
                 ) : (
                     <LanguageProvider>

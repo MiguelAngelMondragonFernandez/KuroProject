@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from users.permissions import IsTokenValid
 from django.db import connection
+from rest_framework import status
 
 class ConversacionViewSet(viewsets.ModelViewSet):
     queryset = Conversacion.objects.all()
@@ -40,3 +41,27 @@ class getConversacionesByIdUser(APIView):
                 return Response({"conversaciones": rows}, status=200)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+        
+class CreateGroup(APIView):
+
+    def post(self, request):
+        try:
+            participantes = request.data.get('participantes') 
+            alias_grupo = request.data.get('alias_grupo') 
+
+            if not participantes:
+                return Response({"error": "La lista de participantes es obligatoria."}, status=status.HTTP_400_BAD_REQUEST)
+
+            if len(participantes.split(',')) > 2 and not alias_grupo:
+                return Response({"error": "El nombre del grupo es obligatorio si hay más de un participante."}, status=status.HTTP_400_BAD_REQUEST)
+
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO conversaciones_conversacion ( alias_grupo, participantes) VALUES (%s, %s)",
+                    [alias_grupo, participantes]
+                )
+
+            return Response({"message": "Grupo creado exitosamente."}, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
