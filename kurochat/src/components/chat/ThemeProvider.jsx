@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { ThemeContext, getContrastColor } from '../../utils/ThemeContext';
+import { LanguageContext } from '../LanguageContext';
 
 export const ThemeProvider = ({ children }) => {
-  const [themeColor, setThemeColor] = useState(localStorage.getItem("themeColor") || "#2D2523");
+  const { config, updateConfig } = useContext(LanguageContext);
+  const [themeColor, setThemeColor] = useState(config.colorPricipal || "#2D2523");
   const [textColor, setTextColor] = useState("#FFFFFF");
 
   const changeThemeColor = (newColor) => {
@@ -10,7 +12,7 @@ export const ThemeProvider = ({ children }) => {
     const formattedColor = newColor.startsWith('#') ? newColor : `#${newColor}`;
     
     setThemeColor(formattedColor);
-    localStorage.setItem("themeColor", formattedColor);
+    updateConfig({ colorPricipal: formattedColor });
     
     const contrastColor = getContrastColor(formattedColor);
     setTextColor(contrastColor);
@@ -20,8 +22,10 @@ export const ThemeProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    changeThemeColor(themeColor);
-  }, []);
+    if (config.colorPricipal) {
+      changeThemeColor(config.colorPricipal);
+    }  
+  }, [config.colorPricipal]);
 
   
   const value = {

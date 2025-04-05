@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { VirtualScroller } from 'primereact/virtualscroller';
 import Settings from './Settings';
-import { LanguageProvider } from './LanguageContext';
 import axios from '../utils/httpgateway';
 import AddUser from './AddUser';
 function SideBar({ asignarIdChat }) {
@@ -117,9 +116,7 @@ function SideBar({ asignarIdChat }) {
                         )}
                     </>
                 ) : (
-                    <LanguageProvider>
-                        <Settings />
-                    </LanguageProvider>
+                        <Settings setState={setState}/>
                 )
             }
         </>

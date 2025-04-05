@@ -5,17 +5,20 @@ import { AuthProvider } from './auth/AuthContext'
 import { ThemeProvider } from './components/chat/ThemeProvider'; 
 
 import 'primeicons/primeicons.css';
+import { LanguageProvider } from './components/LanguageContext';
         
 
 function App() {
 
   return (
     <AuthProvider>
+    <LanguageProvider>
     <ThemeProvider>
       <BrowserRouter>
         <Router />
       </BrowserRouter>
     </ThemeProvider>
+    </LanguageProvider>
     </AuthProvider>
   )
 }
