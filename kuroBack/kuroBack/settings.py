@@ -29,8 +29,7 @@ SECRET_KEY = 'django-insecure-vuf1=c#(+0#f&8m95!yki)=enk)m1-bxtz89x8ia@3^!_x30+9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -41,11 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'users',
     'configuracionesaplicacion',
     'mensajes',
     'conversaciones',
+    'rest_framework',
     'corsheaders'
 ]
 
@@ -65,6 +64,8 @@ ROOT_URLCONF = 'kuroBack.urls'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://192.168.111.241:5173",
     "http://127.0.0.1:5173",
 ]
 
@@ -101,6 +102,7 @@ DATABASES = {
         'PORT': 3306,
     }
 }
+
 
 
 # Password validation
@@ -143,3 +145,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+#Configuración para Gmail
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+# Usar su correo de UTEZ
+EMAIL_HOST_USER = "20223tn026+Reopeko@utez.edu.mx"
+# Obtener de https://myaccount.google.com/apppasswords
+EMAIL_HOST_PASSWORD = "euue qubr qlwu zlik"
