@@ -3,6 +3,7 @@
         "changeLanguage": "Cambiar Idioma",
         "changeColor": "Cambiar Color",
         "profile": "Perfil",
+        "editProfile":"Editar Perfil",
         "settings": "Ajustes",
         "chats": "Chats",
         "logOut":"Cerrar Sesión",
@@ -11,12 +12,17 @@
         "friendsEmail":"Correo del Amigo",
         "add":"Agregar",
         "cancelacion":"Cancelar",
-        "save":"Guardar"
+        "save":"Guardar",
+        "name":"Nombre",
+        "first_name":"Primer Apellido",
+        "last_name":"Segundo Apellido",
+        "configuration":"Configuración del Sistema"
     },
     "en": {
         "changeLanguage": "Change Language",
         "changeColor": "Change Color",
         "profile": "Profile",
+        "editProfile":"Edit Profile", 
         "settings": "Settings",
         "chats": "Chats",
         "logOut":"Log Out",
@@ -25,6 +31,10 @@
         "friendsEmail":"Friend's Email",
         "add":"Add",
         "cancelacion":"Cancel",
-        "save":"Save"
+        "save":"Save",
+        "name":"Name",
+        "first_name":"First Name",
+        "last_name":"Last Name",
+        "configuration":"System Configuration"
     }
 }

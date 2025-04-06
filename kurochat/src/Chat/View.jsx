@@ -11,7 +11,7 @@ function View() {
   };
   return (
     <>
-    <div className="flex flex-row">
+    <div className="flex flex-row" style={{ background: "var(--theme-color)", color: "Var(--text-color)" }}>
       <div className="flex flex-column col-3"><SideBar asignarIdChat={asignarIdChat} /></div>
 
       {

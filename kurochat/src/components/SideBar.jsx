@@ -8,34 +8,41 @@ function SideBar({ asignarIdChat }) {
     const [isMounted, setIsMounted] = useState(false)
     const [state, setState] = useState("listChats")
     const [showAddUserModal, setShowAddUserModal] = useState(false)
+    const [userData, setUserData] = useState(null);
 
     const fetchChats = async () => {
         try {
-        const user = JSON.parse(localStorage.getItem("user"));
+            const user = JSON.parse(localStorage.getItem("user"));
             await axios.doGet(`conversaciones/get/${user.id}/`)
-            .then(response => {
-                const {conversaciones} = response.data;
-                setFriends(conversaciones);
-                
-            })
-            .catch( error => {
-                console.error("Error al obtener los chats:", error);
-            })
+                .then(response => {
+                    const { conversaciones } = response.data;
+                    setFriends(conversaciones);
+
+                })
+                .catch(error => {
+                    console.error("Error al obtener los chats:", error);
+                })
         } catch (error) {
         }
     };
-    
+    const getUser = (() => {
+        const data = localStorage.getItem('user');
+        if (data) {
+            setUserData(JSON.parse(data));
+        }
+    });
 
     useEffect(() => {
+        getUser();
         fetchChats();
     }, []);
 
     const handleAddUser = (newChat) => {
-        setFriends((prevFriends) => [...prevFriends, newChat]); 
+        setFriends((prevFriends) => [...prevFriends, newChat]);
     };
 
     const itemTemplate = (item) => {
-                return (
+        return (
             <div
                 className="flex p-3 cursor-pointer hover:bg-gray-800"
                 style={{ background: "var(--theme-color)", color: "var(--text-color)" }}
@@ -60,26 +67,26 @@ function SideBar({ asignarIdChat }) {
                 state === "listChats" ? (
                     <>
                         <div className="flex flex-col" style={{ background: "var(--theme-color)", color: "Var(--text-color)" }}>
-                            <div className="flex">
-                                <div className="col-6 flex flex-row">
-                                    <h3>Chats</h3>
+                            <div className="flex w-full">
+                                <div className="col-8 flex flex-row">
+                                    <h3 className='text-3xl font-bold'>Chats</h3>
                                 </div>
-                                <div className="col-6 flex flex-row align-items-center ">
+                                <div className="col-4 flex flex-row gap-2 align-items-center">
                                     <i className="pi pi-cog hover:text-blue-400 cursor-pointer" style={{ fontSize: '2rem' }} onClick={() => setState("config")}></i>
-                                    <i className="pi pi-comment  hover:text-blue-400 cursor-pointer" style={{ fontSize: '2rem' }} onClick={() => setShowAddUserModal(true)}></i>
+                                    <i className="pi pi-comment hover:text-blue-400 cursor-pointer" style={{ fontSize: '2rem' }} onClick={() => setShowAddUserModal(true)}></i>
                                 </div>
                             </div>
                         </div>
                         <div style={{ background: "var(--theme-color)", color: "Var(--text-color)" }}>
                             {friends.length === 0 ? (
-                              <div className='text-center text-gray-400 py-10'>No hay chats por el momento</div>  
+                                <div className='text-center text-gray-400 py-10'>No hay chats por el momento</div>
                             ) : (
                                 <VirtualScroller
-                                itemSize={100}
-                                style={{ width: '100%', height: '87vh' }}
-                                items={friends}
-                                itemTemplate={itemTemplate}
-                            />
+                                    itemSize={100}
+                                    style={{ width: '100%', height: '87vh' }}
+                                    items={friends}
+                                    itemTemplate={itemTemplate}
+                                />
                             )}
                         </div>
                         {showAddUserModal && (
@@ -116,7 +123,7 @@ function SideBar({ asignarIdChat }) {
                         )}
                     </>
                 ) : (
-                        <Settings setState={setState}/>
+                    <Settings setState={setState} userData={userData} getUser={getUser} />
                 )
             }
         </>
