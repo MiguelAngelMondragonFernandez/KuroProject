@@ -15,7 +15,7 @@ app.use(cors({
 // Middleware para manejar JSON (por si en el futuro lo necesitas)
 app.use(express.json());
 
-const upload = multer({ dest: '../kurochat/public/uploads/' });
+const upload = multer({ dest: 'uploads/' });
 
 // Función para guardar la imagen correctamente
 const saveImage = (file) => {
