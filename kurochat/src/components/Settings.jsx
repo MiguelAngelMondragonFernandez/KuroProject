@@ -112,10 +112,10 @@ function Settings({ setState, userData, getUser }) {
     }, [userData]);
     return (
         <>
-            <div className='flex flex-column h-screen border-[var(--text-color)] border-right-1' style={{ background: "var(--theme-color)", color: "Var(--text-color)" }}>
+            <div className='flex flex-column h-full border-[var(--text-color)] border-right-1' style={{ background: "var(--theme-color)", color: "Var(--text-color)" }}>
                 <div className="flex flex-col items-center border-[var(--text-color)] border-bottom-1 p-2">
-                    <i className='pi pi-arrow-left' style={{ fontSize: '18px' }} onClick={() => setState("listChats")} />
-                    <span className='mt-2 text-3xl font-bold'>{translations.settings}</span>
+                    <i className='pi pi-arrow-left col-3' style={{ fontSize: '18px' }} onClick={() => setState("listChats")} />
+                    <span className='flex align-items-center justify-content-center text-3xl font-bold'>{translations.settings}</span>
                 </div>
                 <div className="flex w-full  border-[var(--text-color)] border-bottom-1 ">
                     <div className='flex flex-column'>
@@ -211,11 +211,11 @@ function Settings({ setState, userData, getUser }) {
                                 valueTemplate={languageTemplate}
                                 className="w-full"
                                 pt={{
-                                    root: { className: "bg-blue-500 text-black rounded-lg px-2 shadow-md" },
-                                    panel: { className: "bg-blue-200 border border-gray-300 rounded-lg shadow-lg" },
+                                    root: { className: "bg-transparent text-black rounded-lg px-2 shadow-lg" },
+                                    panel: { className: "bg-black text-black border border-gray-300 rounded-lg shadow-lg" },
                                     input: { className: "w-full" },
                                     item: ({ context }) => ({
-                                        className: context.selected ? "bg-blue-600 text-white" : "hover:bg-blue-100",
+                                        className: context.selected ? "bg-transparent text-white" : "hover:bg-white-100",
                                     }),
                                 }}
                             />
