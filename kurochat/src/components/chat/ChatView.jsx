@@ -52,16 +52,10 @@ export const ChatView = ({idChat, name}) => {
     
         // 1️⃣ Subir la imagen solo si existe
         if (file) {
-            const form = new FormData();
-            form.append('file', file);
-    
             try {
-                const response = await fetch('http://localhost:4000/upload', {
-                    method: 'POST',
-                    body: form,
-                });
+                const response = await axios.doPostFormData(file);
     
-                const data = await response.json();
+                const data = await response.data;
     
                 if (data.status !== 200) {
                     console.error('Error al subir el archivo:', data.message);
@@ -128,7 +122,7 @@ export const ChatView = ({idChat, name}) => {
                 <VirtualScroller
                     ref={virtualScrollerRef}
                     items={items}
-                    itemSize={160}
+                    itemSize={190}
                     itemTemplate={itemTemplate}
                     className="border-1 surface-border border-round w-full "
                     style={{ height: '85vh', overflowY: 'auto', background: "#EEE3CF" }}

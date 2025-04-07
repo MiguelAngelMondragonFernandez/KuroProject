@@ -16,7 +16,11 @@
         "name":"Nombre",
         "first_name":"Primer Apellido",
         "last_name":"Segundo Apellido",
-        "configuration":"Configuración del Sistema"
+        "configuration":"Configuración del Sistema",
+        "changePassword":"Cambiar Contraseña",
+        "oldPassword":"",
+        "newPassword":"",
+        "confirmPassword":""
     },
     "en": {
         "changeLanguage": "Change Language",
@@ -35,6 +39,7 @@
         "name":"Name",
         "first_name":"First Name",
         "last_name":"Last Name",
-        "configuration":"System Configuration"
+        "configuration":"System Configuration",
+        "changePassword":"Change ¨Password"
     }
 }
