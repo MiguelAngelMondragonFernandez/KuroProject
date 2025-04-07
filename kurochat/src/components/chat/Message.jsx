@@ -51,8 +51,18 @@ function Message({ idUser, message, date, img }) {
             )}
             <div style={messageContentStyle}>
                 <div style={messageTextStyle}>{message}</div>
-                {img && ( <img src={img} alt="img" style={{ width: '50%', borderRadius: '10px' }} />)}
-               
+                {img && (
+                    <img
+                        src={img}
+                        alt="img"
+                        style={{
+                            width: 'auto',
+                            height: 'auto',
+                            maxHeight: '150px',
+                            borderRadius: '10px',
+                        }}
+                    />
+                )}
                 <div style={messageDateStyle}>{date}</div>
             </div>
             {idUser === userId && (

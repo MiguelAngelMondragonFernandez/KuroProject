@@ -7,7 +7,6 @@ const getToken = () => {
     return null;
 }
 
-
 const instance = axios.create({
     headers: {
         'Content-Type': 'application/json',
@@ -30,6 +29,20 @@ export default {
         return instance.post(import.meta.env.VITE_URL_SERVER + url, data);
     },
 
+    async doPostFormData(data) {
+        const file = new FormData();
+        file.append('file', data);
+
+        // Crear una nueva instancia para esta solicitud con headers específicos
+        const formDataInstance = axios.create({
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        return formDataInstance.post(import.meta.env.VITE_URL_SERVERIMG, file);
+    },
+
     async doPut(url, data) {
         return instance.put(import.meta.env.VITE_URL_SERVER + url, data);
     },
@@ -37,5 +50,4 @@ export default {
     async doDelete(url) {
         return instance.delete(import.meta.env.VITE_URL_SERVER + url);
     },
-    
 }
