@@ -218,7 +218,6 @@ class GetUserByEmail(APIView):
                 return Response(user_data, status=200)
         except Exception as e:
             return Response({'error': str(e)}, status=500)
-
 class UpdateUserInfo(APIView):
     permission_classes = [IsTokenValid]  
 
@@ -227,6 +226,7 @@ class UpdateUserInfo(APIView):
         name = request.data.get("name")
         first_name = request.data.get("first_name")
         last_name = request.data.get("last_name")
+        url_photo = request.data.get("url_photo")  # Nuevo campo
 
         if not email:
             return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -241,14 +241,15 @@ class UpdateUserInfo(APIView):
 
                 user_id = user[0]
 
-                # Actualizar los campos necesarios
+                # Actualizar los campos necesarios, incluyendo la URL de la foto
                 cursor.execute("""
                     UPDATE users_user 
-                    SET name = %s, first_name = %s, last_name = %s 
+                    SET name = %s, first_name = %s, last_name = %s, url_photo = %s
                     WHERE id = %s
-                """, [name, first_name, last_name, user_id])
+                """, [name, first_name, last_name, url_photo, user_id])
 
                 return Response({"message": "User updated successfully."}, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

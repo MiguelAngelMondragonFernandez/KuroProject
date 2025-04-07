@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from "primereact/inputtext";
 import { Button } from 'primereact/button';
+import FileInput from './FileInput'
 
 function Settings({ setState, userData, getUser }) {
     const languages = [
@@ -23,7 +24,7 @@ function Settings({ setState, userData, getUser }) {
     const [name, setName] = useState('');
     const [firstName, setFirstName] = useState('');
     const [latsName, setLastName] = useState('');
-
+    const pathImg = userData?.url_photo || "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png";
     const toggleEdit = () => {
         setIsEditing(!isEditing);
     };
@@ -50,12 +51,21 @@ function Settings({ setState, userData, getUser }) {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             const token = user.access_token;
+
+            let photoUrl = userData.url_photo; // Por defecto usamos la actual
+            // Si hay un nuevo archivo, lo subimos
+                const uploadResponse = await axios.doPostFormData(file).then(response => response.data).catch(error => {
+                    console.error('Error al subir la imagen:', error); return null;
+                })
+            photoUrl=uploadResponse?.path|| "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png";
             const updatedData = {
                 email: user.email,
                 name,
                 first_name: firstName,
                 last_name: latsName,
+                url_photo: photoUrl,
             };
+
             const response = await axios.doPut(`users/updateUser/`, updatedData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -110,6 +120,11 @@ function Settings({ setState, userData, getUser }) {
             setLastName(userData.last_name || '');
         }
     }, [userData]);
+    const [file, setFile] = React.useState(null)
+
+    const asignarArchivo = (file) => {
+        setFile(file)
+    }
     return (
         <>
             <div className='flex flex-column h-full border-[var(--text-color)] border-right-1' style={{ background: "var(--theme-color)", color: "Var(--text-color)" }}>
@@ -124,7 +139,7 @@ function Settings({ setState, userData, getUser }) {
                                 <span className='text-sm'>{translations.profile}</span>
                             </div>
                             <div className='flex flex-column w-full align-items-center justify-content-center'>
-                                <img className='border-circle w-6rem h-6rem ' src="https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png" alt="" srcset="" />
+                                <img className='border-circle w-6rem h-6rem ' src={pathImg} alt="" srcset="" />
 
                                 <div className="flex w-full text-center align-items-center justify-content-center">
                                     <span className='ml-3 text-sm font-normal'>{userData.email}</span>
@@ -138,9 +153,12 @@ function Settings({ setState, userData, getUser }) {
                         </div>
                         {isEditing && (
                             <div id='editProfile' className={`${isEditing ? '' : 'hidden'} pb-3 pl-4 `}>
-                                <div className='flex mb-2 mt-3 w-full'>
+                                <div className='mb-2 mt-3 w-full'>
                                     <i className='pi pi-user-edit ' style={{ fontSize: '15px' }} />
                                     <span className='ml-3 text-sm'>{translations.editProfile}</span>
+                                </div>
+                                <div className="flex pl-5 pb-7">
+                                    <FileInput File={asignarArchivo} defaultImage={pathImg} className="w-6rem h-6rem " />
                                 </div>
                                 <div className='flex mt-5 mb-3 '>
                                     <FloatLabel>
