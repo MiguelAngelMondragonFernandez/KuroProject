@@ -31,7 +31,7 @@ function Register() {
         try {
             const uploadResponse = await axios.doPostFormData(file).then(response => response.data).catch(error => {
                 console.error('Error al subir la imagen:', error); return null;});
-            const uploadData = uploadResponse ? uploadResponse.data : '../assets/defaul.png';
+            const uploadData = uploadResponse ? uploadResponse : '../assets/defaul.png';
             const Register = {
             name,
             first_name: apP,
