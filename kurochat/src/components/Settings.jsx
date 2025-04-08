@@ -28,7 +28,8 @@ function Settings({ setState, userData, getUser }) {
     const [odlPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const pathImg = userData?.url_photo || "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png";
+    const [file, setFile] = React.useState(null)
+    const pathImg = userData.url_photo || "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png";
 
     const toggleEdit = () => {
         setIsEditing(!isEditing);
@@ -62,12 +63,15 @@ function Settings({ setState, userData, getUser }) {
             const user = JSON.parse(localStorage.getItem('user'));
             const token = user.access_token;
 
-            let photoUrl = userData.url_photo; // Por defecto usamos la actual
+            var photoUrl = userData.url_photo; // Por defecto usamos la actual
             // Si hay un nuevo archivo, lo subimos
+
+            if(file){
             const uploadResponse = await axios.doPostFormData(file).then(response => response.data).catch(error => {
                 console.error('Error al subir la imagen:', error); return null;
             })
             photoUrl = uploadResponse?.path || "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png";
+        }
             const updatedData = {
                 email: user.email,
                 name,
@@ -76,17 +80,14 @@ function Settings({ setState, userData, getUser }) {
                 url_photo: photoUrl,
             };
 
-            const response = await axios.doPut(`users/updateUser/`, updatedData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await axios.doPut(`users/updateUser/`, updatedData);
 
             showAlert('success', 'Datos actualizados', 'Tu perfil ha sido actualizado exitosamente');
             setIsEditing(false);
             const updatedUser = { ...user, ...updatedData };
             localStorage.setItem('user', JSON.stringify(updatedUser));
             getUser();
+            setFile(null);
         } catch (error) {
             console.error('Error al actualizar usuario:', error);
             showAlert('error', 'Error', 'No se pudo actualizar el perfil');
@@ -130,7 +131,6 @@ function Settings({ setState, userData, getUser }) {
             setLastName(userData.last_name || '');
         }
     }, [userData]);
-    const [file, setFile] = React.useState(null)
 
     const asignarArchivo = (file) => {
         setFile(file)
