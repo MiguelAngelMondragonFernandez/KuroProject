@@ -46,7 +46,7 @@ function Register() {
             if(!error){
             await axios.doPost('users/register/', Register)
             .then(response => {
-                showAlert(response.status, 'Registro exitoso', '¡Bienvenido!');
+                showAlert('success', 'Registro exitoso', '¡Bienvenido!');
             setTimeout(() => navigate('/login'), 2000);
             })
             .catch(error => {
