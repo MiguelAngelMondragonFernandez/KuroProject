@@ -66,7 +66,7 @@ function SideBar({ asignarIdChat }) {
             {
                 state === "listChats" ? (
                     <>
-                        <div className="flex flex-col" style={{ background: "var(--theme-color)", color: "Var(--text-color)" }}>
+                        <div className="flex flex-col h-full" style={{ background: "var(--theme-color)", color: "Var(--text-color)" }}>
                             <div className="flex w-full">
                                 <div className="col-8 flex flex-row">
                                     <h3 className='text-3xl font-bold'>Chats</h3>

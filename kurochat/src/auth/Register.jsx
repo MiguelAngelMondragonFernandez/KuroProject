@@ -20,26 +20,27 @@ function Register() {
 
     const [file, setFile] = React.useState(null)
 
-    const asignarArchivo = (file) => {       
+    const asignarArchivo = (file) => {
         setFile(file)
     }
 
 
     const SetRegister = async (e) => {
         e.preventDefault()
-        
+
         try {
             const uploadResponse = await axios.doPostFormData(file).then(response => response.data).catch(error => {
-                console.error('Error al subir la imagen:', error); return null;});
+                console.error('Error al subir la imagen:', error); return null;
+            });
             const uploadData = uploadResponse ? uploadResponse.data : '../assets/defaul.png';
-            const path=uploadResponse?.path || "../assets/defaul.png";
+            const path = uploadResponse?.path || "../assets/defaul.png";
             const Register = {
-            name,
-            first_name: apP,
-            last_name: apM,
-            email,
-            password: password === confirmPassword ? password : null,
-            url_photo: path
+                name,
+                first_name: apP,
+                last_name: apM,
+                email,
+                password: password === confirmPassword ? password : null,
+                url_photo: path
             };
 
             await axios.doPost('users/register/', Register);
