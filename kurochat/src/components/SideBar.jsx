@@ -44,7 +44,7 @@ function SideBar({ asignarIdChat }) {
     const itemTemplate = (item) => {
         return (
             <div
-                className="flex p-3 cursor-pointer hover:bg-gray-800"
+                className="flex p-3 cursor-pointer hover:bg-gray-800 hover:text-white"
                 style={{ background: "var(--theme-color)", color: "var(--text-color)" }}
                 onClick={() => asignarIdChat(item.id, item.nombre_conversacion)}
             >
@@ -54,9 +54,8 @@ function SideBar({ asignarIdChat }) {
                     className="border-circle"
                     style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                 />
-                <div className="ml-3">
-                    <div className="font-bold text-white">{item.nombre_conversacion}</div>
-                    <div className="text-sm text-gray-400">{item.ultimo_mensaje}</div>
+                <div className="ml-3 mt-3 " >
+                    <div className="font-bold">{item.nombre_conversacion}</div>
                 </div>
             </div>
         )

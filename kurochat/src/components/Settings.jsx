@@ -225,7 +225,7 @@ function Settings({ setState, userData, getUser }) {
                 </div>
 
                 <div className="flex flex-column pl-4 pr-4 pb-3 border-bottom-1 border-[var(--text-color)]">
-                    <div className="flex flex-column mb-2 mt-3">
+                    <div className="flex flex-column mb-2 mt-3 cursor-pointer">
                         <div className="flex" onClick={toggleConfig}>
                             <i
                                 className="pi pi-cog"
@@ -323,7 +323,7 @@ function Settings({ setState, userData, getUser }) {
 
                 <div className="flex flex-column pl-4 pr-4 pb-3 border-bottom-1 border-[var(--text-color)]">
                     <div className="">
-                        <div className="flex mb-2 mt-3 w-full" onClick={toggleChangePassword}>
+                        <div className="flex mb-2 mt-3 w-full cursor-pointer" onClick={toggleChangePassword}>
                             <i
                                 className="pi pi-lock "
                                 style={{ fontSize: "15px" }}
@@ -413,7 +413,7 @@ function Settings({ setState, userData, getUser }) {
                     )}
                 </div>
                 </div>
-                <div className="flex align-items-center pt-4 pl-4 pb-4 mt-auto" onClick={handleLougout}>
+                <div className="flex align-items-center pt-4 pl-4 pb-4 mt-auto cursor-pointer" onClick={handleLougout}>
                     <i className='pi pi-sign-out' style={{ fontSize: '20px' }} />
                     <span className="ml-3">{translations.logOut}</span>
                 </div>

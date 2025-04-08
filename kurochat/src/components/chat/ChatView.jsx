@@ -130,7 +130,7 @@ export const ChatView = ({idChat, name}) => {
             </div>
             <div className="flex flex-row p-2" style={{ backgroundColor: 'var(--theme-color)', color: 'var(--text-color)', borderColor: 'var(--text-color)' }} >
                 <i
-                    className="pi pi-image"
+                    className="pi pi-image cursor-pointer"
                     style={{ fontSize: '2rem', marginLeft: '10px', marginRight: '15px' }}
                     onClick={handleSendImage}
                     onChange={(e) => setFile(e.target.files[0])}
@@ -149,7 +149,7 @@ export const ChatView = ({idChat, name}) => {
                    maxLength={250}
                 />
                 <i
-                    className="pi pi-send"
+                    className="pi pi-send cursor-pointer"
                     style={{ fontSize: '2rem', marginLeft: '10px' }}
                     onClick={handleSendMessage}
                 ></i>
