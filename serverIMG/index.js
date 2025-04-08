@@ -14,7 +14,7 @@ app.use(cors({
 
 app.use(express.json());
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: '../kurochat/public/uploads/' });
 
 const saveImage = (file) => {
   try {

@@ -1,0 +1,6 @@
+.relative:hover .overlay {
+    background-color: rgba(0, 0, 0, 0.3); /* Oscurecimiento */
+}
+.overlay {
+    background-color: rgba(0, 0, 0, 0);
+}

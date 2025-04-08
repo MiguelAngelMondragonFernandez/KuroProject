@@ -27,28 +27,34 @@ function Register() {
 
     const SetRegister = async (e) => {
         e.preventDefault()
-
-        try {
-            const uploadResponse = await axios.doPostFormData(file).then(response => response.data).catch(error => {
-                console.error('Error al subir la imagen:', error); return null;
-            });
-            const uploadData = uploadResponse ? uploadResponse.data : '../assets/defaul.png';
-            const path = uploadResponse?.path || "../assets/defaul.png";
+            var error = false
+            const uploadResponse = await axios.doPostFormData(file)
+            .then(response =>{ error = false; return response.data; })
+            .catch(err => {console.error('Error al subir la imagen:', err); error = true; return null;});
+            console.log(error);
+            
+            const uploadData = uploadResponse ? uploadResponse.path : '../assets/defaul.png';
+            
             const Register = {
-                name,
-                first_name: apP,
-                last_name: apM,
-                email,
-                password: password === confirmPassword ? password : null,
-                url_photo: path
+            name,
+            first_name: apP,
+            last_name: apM,
+            email,
+            password: password === confirmPassword ? password : null,
+            url_photo: uploadData
             };
-
-            await axios.doPost('users/register/', Register);
-            showAlert('success', 'Registro exitoso', '¡Bienvenido!');
+            if(!error){
+            await axios.doPost('users/register/', Register)
+            .then(response => {
+                showAlert(response.status, 'Registro exitoso', '¡Bienvenido!');
             setTimeout(() => navigate('/login'), 2000);
-        } catch (error) {
-            console.error('Error:', error);
-            showAlert('error', 'Error al registrar', '¡Error!');
+            })
+            .catch(error => {
+                console.error('Error al registrar:', error);
+                showAlert('error', 'Error al registrar', '¡Error!');
+            });
+        } else {
+            showAlert('error', 'Ocurrió un error al subir la imagen', '¡Error!');
         }
     }
 
