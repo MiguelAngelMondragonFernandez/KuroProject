@@ -252,3 +252,34 @@ class UpdateUserInfo(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class UpdatePassword(APIView):
+    permission_classes = [IsTokenValid]  
+
+    def put(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        if not email or not password:
+            return Response({"error": "Email and password are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with connection.cursor() as cursor:
+                # Verificar que el usuario exista
+                cursor.execute("SELECT id FROM users_user WHERE email = %s", [email])
+                user = cursor.fetchone()
+                if user is None:
+                    return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+                user_id = user[0]
+
+                # Actualizar la contraseña
+                cursor.execute("""
+                    UPDATE users_user 
+                    SET password = %s
+                    WHERE id = %s
+                """, [password, user_id])
+
+                return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
