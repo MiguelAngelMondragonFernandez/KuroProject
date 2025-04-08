@@ -92,7 +92,38 @@ function Settings({ setState, userData, getUser }) {
             showAlert('error', 'Error', 'No se pudo actualizar el perfil');
         }
     };
+    
+    const changePassword = async () =>{
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const token = user.access_token;
+            const email = user.email;
+            
+            if(newPassword !== confirmPassword){
+                showAlert('error', 'Error', 'Las contraseñas no coinciden');
+                return;
+            }
 
+
+            const updatedData = {
+                email: email,
+                password: newPassword
+            };
+
+            const response = await axios.doPut(`users/updatePassword/`, updatedData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            showAlert('success', 'Contraseña actualizada', 'Tu contraseña ha sido actualizada exitosamente');
+            setIsChangePassword(false);
+        } catch (error) {
+            console.error('Error al actualizar contraseña:', error);
+            showAlert('error', 'Error', 'No se pudo actualizar la contraseña');
+        }
+    }
+    
     const handleColorChange = (e) => {
         const newColor = '#' + e.value;
         changeThemeColor(newColor);
@@ -122,7 +153,7 @@ function Settings({ setState, userData, getUser }) {
             </div>
         );
     };
-    console.log(userData)
+
     useEffect(() => {
         if (userData) {
             setName(userData.name || '');
@@ -344,7 +375,7 @@ function Settings({ setState, userData, getUser }) {
                                         id="name"
                                         style={{ background: "transparent" }}
                                         className="border-1 "
-                                        value={name}
+                                        value={odlPassword}
                                         onChange={(e) => setOldPassword(e.target.value)}
                                     />
                                     <label
@@ -360,7 +391,7 @@ function Settings({ setState, userData, getUser }) {
                                     <InputText
                                         id="first_name"
                                         style={{ background: "transparent" }}
-                                        value={firstName}
+                                        value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
                                     />
                                     <label
@@ -376,7 +407,7 @@ function Settings({ setState, userData, getUser }) {
                                     <InputText
                                         id="last_name"
                                         style={{ background: "transparent" }}
-                                        value={latsName}
+                                        value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                     />
                                     <label
@@ -392,7 +423,7 @@ function Settings({ setState, userData, getUser }) {
                                     icon="pi pi-save"
                                     label={translations.save}
                                     className="w-full"
-                                    onClick={handleUpdateUser}
+                                    onClick={changePassword}
                                     style={{
                                         color: "Var(--text-color)",
                                         background: "transparent",
