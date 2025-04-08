@@ -9,29 +9,25 @@ const TableUser = ({ users, openEditModal, toggleStatus }) => {
 
   const imageBodyTemplate = (rowData) => {
     return (
-      <Image
-        src={rowData.url_photo}
-        alt="Foto de usuario"
-        width="90"
-        height="auto"
-        className="rounded-full"
-      />
+      <div className="circle-container">
+          <Image src={rowData.url_photo} zoomSrc={rowData.url_photo} alt={rowData.name} className="circle-image" preview />
+        </div>
     );
   };
 
   const nameBodyTemplate = (rowData) => {
-    return `${rowData.first_name} ${rowData.last_name}`;
+    return `${rowData.name} ${rowData.first_name} ${rowData.last_name}`;
   };
 
   const statusBodyTemplate = (rowData) => {
     const isHabilitado = rowData.is_active;
     const buttonClass = isHabilitado ? 'p-button-success' : 'p-button-danger';
     const buttonLabel = isHabilitado ? 'Habilitado' : 'Deshabilitado';
-    
+
     return (
       <Button
         label={buttonLabel}
-        className={`p-button-rounded ${buttonClass}`}
+        className={`p-button-rounded ${buttonClass} status-button`}
         onClick={() => toggleStatus(rowData.id, !isHabilitado)}
       />
     );

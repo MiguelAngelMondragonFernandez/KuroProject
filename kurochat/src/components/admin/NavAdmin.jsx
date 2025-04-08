@@ -4,10 +4,15 @@ import { Menubar } from "primereact/menubar";
 import { Button } from "primereact/button";
 import LogoKuro from "../../assets/img/KuroLogo.png";
 import "../../admin.css";
+import { getUser } from "../../utils/httpgateway";
 
 function NavAdmin() {
   const navigate = useNavigate();
   const location = useLocation();
+  const user = getUser();
+  const firstName = user?.first_name.split(" ")[0] || "";
+  const userNav = user?.name?.split(" ")[0] || "";
+  const userNameNav = `${userNav} ${firstName}`;
 
   const items = [
     {
@@ -31,7 +36,7 @@ function NavAdmin() {
 
   const end = (
     <Button
-      label="Miguel Moreno"
+      label={userNameNav}
       icon="pi pi-user"
       className={`profile-button ${
         location.pathname === "/admin/perfil" ? "profile-button-selected" : ""

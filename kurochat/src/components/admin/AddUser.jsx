@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
-import { Password } from "primereact/password";
 import { Button } from "primereact/button";
-import '../../admin.css'
+import FileInput from "../FileInput"; // Importar el componente FileInput
+import "../../admin.css";
 
 const AddUser = ({
   showModal,
@@ -15,7 +15,11 @@ const AddUser = ({
   setPassword,
   password1,
   setPassword1,
+  setFile, // Nuevo prop para manejar el archivo
 }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   return (
     <Dialog
       header="Agregar Usuario"
@@ -29,8 +33,20 @@ const AddUser = ({
             Nombre(s):
           </label>
           <InputText
-            id="first_name"
+            id="name"
             placeholder="Ingrese su nombre"
+            className="input-full"
+            value={formData.name}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div>
+          <label htmlFor="last_name" className="font-semibold label-spacing">
+            Apellido Paterno:
+          </label>
+          <InputText
+            id="first_name"
+            placeholder="Ingrese su apellido paterno"
             className="input-full"
             value={formData.first_name}
             onChange={handleInputChange}
@@ -38,11 +54,11 @@ const AddUser = ({
         </div>
         <div>
           <label htmlFor="last_name" className="font-semibold label-spacing">
-            Apellidos:
+            Apellido Materno:
           </label>
           <InputText
             id="last_name"
-            placeholder="Ingrese su apellidos"
+            placeholder="Ingrese su apellido materno"
             className="input-full"
             value={formData.last_name}
             onChange={handleInputChange}
@@ -63,41 +79,49 @@ const AddUser = ({
         </div>
         <div>
           <label htmlFor="url_photo" className="font-semibold label-spacing">
-            URL de Foto de Perfil:
+            Foto de Perfil:
           </label>
-          <InputText
-            id="url_photo"
-            placeholder="Ingrese su url de foto de perfil"
-            className="input-full"
-            value={formData.url_photo}
-            onChange={handleInputChange}
-          />
+          <FileInput File={setFile} />
         </div>
         <div>
           <label htmlFor="password" className="font-semibold label-spacing">
             Contraseña:
           </label>
-          <Password
-            id="password"
-            placeholder="Ingrese su nueva contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            toggleMask
-            className="input-full"
-          />
+          <div className="p-inputgroup">
+            <InputText
+              id="password"
+              placeholder="Ingrese su contraseña"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input-full"
+            />
+            <Button
+              icon={showPassword ? "pi pi-eye-slash" : "pi pi-eye"}
+              onClick={() => setShowPassword(!showPassword)}
+              className="p-button-secondary"
+            />
+          </div>
         </div>
         <div>
           <label htmlFor="password1" className="font-semibold label-spacing">
             Confirmar Contraseña:
           </label>
-          <Password
-            id="password1"
-            placeholder="Ingrese nuevamente la contraseña"
-            value={password1}
-            onChange={(e) => setPassword1(e.target.value)}
-            toggleMask
-            className="input-full"
-          />
+          <div className="p-inputgroup">
+            <InputText
+              id="password1"
+              placeholder="Confirme su contraseña"
+              type={showConfirmPassword ? "text" : "password"}
+              value={password1}
+              onChange={(e) => setPassword1(e.target.value)}
+              className="input-full"
+            />
+            <Button
+              icon={showConfirmPassword ? "pi pi-eye-slash" : "pi pi-eye"}
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="p-button-secondary"
+            />
+          </div>
         </div>
         <div className="flex justify-center gap-4 mt-3">
           <Button

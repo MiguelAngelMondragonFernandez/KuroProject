@@ -218,30 +218,29 @@ class GetUserByEmail(APIView):
                 return Response(user_data, status=200)
         except Exception as e:
             return Response({'error': str(e)}, status=500)
+        
 class UpdateUserInfo(APIView):
     permission_classes = [IsTokenValid]  
 
-    def put(self, request):
+    def put(self, request, user_id):
         email = request.data.get("email")
         name = request.data.get("name")
         first_name = request.data.get("first_name")
         last_name = request.data.get("last_name")
-        url_photo = request.data.get("url_photo")  # Nuevo campo
+        url_photo = request.data.get("url_photo") 
 
         if not email:
             return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             with connection.cursor() as cursor:
-                # Verificar que el usuario exista
-                cursor.execute("SELECT id FROM users_user WHERE email = %s", [email])
+                cursor.execute("SELECT id FROM users_user WHERE id = %s", [user_id])
                 user = cursor.fetchone()
                 if user is None:
                     return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
                 user_id = user[0]
 
-                # Actualizar los campos necesarios, incluyendo la URL de la foto
                 cursor.execute("""
                     UPDATE users_user 
                     SET name = %s, first_name = %s, last_name = %s, url_photo = %s
@@ -253,3 +252,27 @@ class UpdateUserInfo(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class UpdateIsActive(APIView):
+    def patch(self, request, user_id):
+        is_active = request.data.get("is_active")
+        if is_active not in [0, 1]:
+            return Response(
+                {"error": "Invalid value for is_active. Must be 0 or 1."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE users_user SET is_active = %s WHERE id = %s",
+                    [is_active, user_id],
+                )
+                if cursor.rowcount == 0:
+                    return Response(
+                        {"error": "Usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND
+                    )
+            return Response(
+                {"message": "is_active actualizado con éxito."},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

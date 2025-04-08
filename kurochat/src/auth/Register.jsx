@@ -27,33 +27,33 @@ function Register() {
 
     const SetRegister = async (e) => {
         e.preventDefault()
-            var error = false
-            var uploadData = null
-            if(file){
+        var error = false
+        var uploadData = null
+        if (file) {
             const uploadResponse = await axios.doPostFormData(file)
-            .then(response =>{ error = false; return response.data; })
-            .catch(err => {console.error('Error al subir la imagen:', err); error = true; return null;});
+                .then(response => { error = false; return response.data; })
+                .catch(err => { console.error('Error al subir la imagen:', err); error = true; return null; });
             uploadData = uploadResponse ? uploadResponse.path : null;
         }
-            
-            const Register = {
+
+        const Register = {
             name,
             first_name: apP,
             last_name: apM,
             email,
             password: password === confirmPassword ? password : null,
             url_photo: uploadData
-            };
-            if(!error && Register.password){
+        };
+        if (!error && Register.password) {
             await axios.doPost('users/register/', Register)
-            .then(response => {
-                showAlert('success', 'Registro exitoso', '¡Bienvenido!');
-            setTimeout(() => navigate('/login'), 2000);
-            })
-            .catch(error => {
-                console.error('Error al registrar:', error);
-                showAlert('error', 'Error al registrar', '¡Error!');
-            });
+                .then(response => {
+                    showAlert('success', 'Registro exitoso', '¡Bienvenido!');
+                    setTimeout(() => navigate('/login'), 2000);
+                })
+                .catch(error => {
+                    console.error('Error al registrar:', error);
+                    showAlert('error', 'Error al registrar', '¡Error!');
+                });
         } else {
             showAlert('error', 'Ocurrió un error al subir la imagen', '¡Error!');
         }
@@ -65,6 +65,7 @@ function Register() {
             <div className="flex justify-content-center align-items-center h-screen" style={{ backgroundColor: '#F2E1C2' }}>
                 <div onSubmit={SetRegister} className="field flex flex-column gap-3 bg-gray-800 p-5 border-round shadow-2">
                     <div className="field">
+                        <p>Foto de Perfil:</p>
                         <FileInput File={asignarArchivo} />
                     </div>
                     <div className="grid">
