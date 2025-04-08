@@ -21,6 +21,7 @@ def create_token_recovery(user):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsTokenValid]	
 
 
 class LoginView(APIView):
