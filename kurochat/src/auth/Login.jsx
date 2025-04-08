@@ -38,6 +38,13 @@ function Login() {
         .then(response => {
             const {user} = response.data;  
             localStorage.setItem('user', JSON.stringify(user));        
+            localStorage.setItem('config', JSON.stringify({
+                colorPricipal: "#000000",
+                tema: "light",
+                idioma: "es",
+                usuario: user.id,
+                id: null,
+            }));
             showAlert('success', 'Inicio de sesión exitoso', '¡Bienvenido!')
             setTimeout(() => {
                 navigate('/chats')

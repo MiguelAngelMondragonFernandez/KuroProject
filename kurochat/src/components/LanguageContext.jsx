@@ -1,25 +1,40 @@
 import React , {createContext, useState, useEffect} from 'react';
-import {cargarIdiomas, guardarIdioma} from "../utils/languajeContext";
+import {cargarIdiomas} from "../utils/languajeContext";
 
 export const LanguageContext = createContext();
 
 export function LanguageProvider({children}) {
-    const savedLanguageCode = localStorage.getItem('idioma') || 'es';
-    const [language, setLanguage] = useState(savedLanguageCode);
-    const [translations, setTranslations] = useState(cargarIdiomas(savedLanguageCode));
+    const defaultConfig = {
+        colorPricipal: "#000000",
+        tema: "light",
+        idioma: "es",
+        usuario: null,
+        id: null,
+    };
+    const savedConfig = JSON.parse(localStorage.getItem('config')) || defaultConfig;    
+    const [config, setConfig] = useState(savedConfig);
+    const [translations, setTranslations] = useState(cargarIdiomas(savedConfig.idioma));
 
     const changeLanguage = (code) => {
-        setLanguage(code);
+        const updatedConfig = { ...config, idioma: code };
+        setConfig(updatedConfig);
         setTranslations(cargarIdiomas(code));
-        guardarIdioma(code);
+        localStorage.setItem('config', JSON.stringify(updatedConfig));
     };
 
+    const updateConfig = (newConfig) => {
+        const updatedConfig = { ...config, ...newConfig };
+        setConfig(updatedConfig);
+        localStorage.setItem('config', JSON.stringify(updatedConfig));
+    };
+
+
     useEffect(() => {
-        setTranslations(cargarIdiomas(language));
-    }, [language]);
+        setTranslations(cargarIdiomas(config.idioma));
+    }, [config.idioma]);
 
     return (
-        <LanguageContext.Provider value={{ language, translations, changeLanguage }}>
+        <LanguageContext.Provider value={{ config, translations, changeLanguage, updateConfig }}>
             {children}
         </LanguageContext.Provider>
     );

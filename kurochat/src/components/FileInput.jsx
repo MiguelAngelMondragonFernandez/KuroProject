@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Upload } from "lucide-react";
 
-export default function FileUploader({File}) {
+export default function FileUploader({ File, defaultImage, className = "" }) {
     const [fileName, setFileName] = useState("");
-    const [preview, setPreview] = useState(null);
+    const [preview, setPreview] = useState(defaultImage || null);
+
+    useEffect(() => {
+        if (defaultImage) {
+            setPreview(defaultImage);
+        }
+    }, [defaultImage]);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -11,40 +17,26 @@ export default function FileUploader({File}) {
             setFileName(file.name);
             const imageUrl = URL.createObjectURL(file);
             setPreview(imageUrl);
-            File(file); // Enviar la URL al estado padre
+            File(file);
         }
     };
 
     return (
-        <div className="flex flex-col gap-2">
-            <p className="text-white text-sm font-medium flex justify-content-center ">Foto de perfil:</p>
-
-            {preview ? (
-                <label className="cursor-pointer">
-                    <img 
-                        src={preview} 
-                        alt="Vista previa" 
-                        className="w-10rem h-10rem border-circle object-cover rounded-full border border-gray-700 hover:opacity-75 transition-all"
-                    />
-                    <input 
-                        type="file" 
-                        accept="image/*" 
-                        className="hidden"
-                        onChange={handleFileChange}
-                    />
-                </label>
-            ) : (
-                <label className="flex flex-col items-center justify-center gap-2 p-4 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-all">
-                    <Upload className="w-8 h-8" />
-                    <span>{fileName || "Seleccionar archivo"}</span>
-                    <input 
-                        type="file" 
-                        accept="image/*" 
-                        className="hidden"
-                        onChange={handleFileChange}
-                    />
-                </label>
-            )}
+        <div className={`flex flex-column align-items-center gap-2 ${className}`}>
+            <p className="text-white text-sm font-medium">{fileName || "Foto de perfil:"}</p>
+            <label className="cursor-pointer">
+                <img 
+                    src={preview || defaultImage} 
+                    alt="Vista previa" 
+                    className="w-6rem h-6rem border-circle object-cover border border-gray-700 hover:opacity-75 transition-all"
+                />
+                <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden"
+                    onChange={handleFileChange}
+                />
+            </label>
         </div>
     );
 }

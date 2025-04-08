@@ -3,6 +3,7 @@
         "changeLanguage": "Cambiar Idioma",
         "changeColor": "Cambiar Color",
         "profile": "Perfil",
+        "editProfile":"Editar Perfil",
         "settings": "Ajustes",
         "chats": "Chats",
         "logOut":"Cerrar Sesión",
@@ -10,12 +11,22 @@
         "addFriend":"Agregar Amigo",
         "friendsEmail":"Correo del Amigo",
         "add":"Agregar",
-        "cancelacion":"Cancelar"
+        "cancelacion":"Cancelar",
+        "save":"Guardar",
+        "name":"Nombre",
+        "first_name":"Primer Apellido",
+        "last_name":"Segundo Apellido",
+        "configuration":"Configuración del Sistema",
+        "changePassword":"Cambiar Contraseña",
+        "oldPassword":"Anterior Contraseña",
+        "newPassword":"Nueva Contraseña",
+        "confirmPassword":"Confirmar Contraseña"
     },
     "en": {
         "changeLanguage": "Change Language",
         "changeColor": "Change Color",
         "profile": "Profile",
+        "editProfile":"Edit Profile", 
         "settings": "Settings",
         "chats": "Chats",
         "logOut":"Log Out",
@@ -23,6 +34,15 @@
         "addFriend":"Add Friend",
         "friendsEmail":"Friend's Email",
         "add":"Add",
-        "cancelacion":"Cancel"
+        "cancelacion":"Cancel",
+        "save":"Save",
+        "name":"Name",
+        "first_name":"First Name",
+        "last_name":"Last Name",
+        "configuration":"System Configuration",
+        "changePassword":"Change Password",
+        "oldPassword":"Previous Password",
+        "newPassword":"New Password",
+        "confirmPassword":"Confirm Password"
     }
 }
