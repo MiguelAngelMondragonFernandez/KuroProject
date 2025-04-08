@@ -28,12 +28,13 @@ function Register() {
     const SetRegister = async (e) => {
         e.preventDefault()
             var error = false
+            var uploadData = null
+            if(file){
             const uploadResponse = await axios.doPostFormData(file)
             .then(response =>{ error = false; return response.data; })
             .catch(err => {console.error('Error al subir la imagen:', err); error = true; return null;});
-            console.log(error);
-            
-            const uploadData = uploadResponse ? uploadResponse.path : '../assets/defaul.png';
+            uploadData = uploadResponse ? uploadResponse.path : null;
+        }
             
             const Register = {
             name,
@@ -43,7 +44,7 @@ function Register() {
             password: password === confirmPassword ? password : null,
             url_photo: uploadData
             };
-            if(!error){
+            if(!error && Register.password){
             await axios.doPost('users/register/', Register)
             .then(response => {
                 showAlert('success', 'Registro exitoso', '¡Bienvenido!');
