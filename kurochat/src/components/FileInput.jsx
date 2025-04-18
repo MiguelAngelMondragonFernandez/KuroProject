@@ -24,7 +24,6 @@ export default function FileUploader({ File, defaultImage, className = "" }) {
 
     return (
         <div className="flex flex-column justify-content-center align-items-center gap-2">
-            <p className="text-white text-sm font-medium flex justify-content-center ">Foto de perfil:</p>
 
             {preview ? (
                 <label className="cursor-pointer">

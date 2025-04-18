@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const getToken = () => {
+export const getToken = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     if(user)
         return user.access_token;
@@ -19,6 +19,17 @@ instance.interceptors.request.use(
          return config;
     }
 );
+
+export const getUser = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user)
+        return null;
+    return user;
+}
+
+export const logout = () => {
+    localStorage.removeItem("user");
+}
 
 export default {
     async doGet(url) {
@@ -41,6 +52,10 @@ export default {
         });
 
         return formDataInstance.post(import.meta.env.VITE_URL_SERVERIMG, file);
+    },
+
+    async doPatch(url, data) {
+        return instance.patch(import.meta.env.VITE_URL_SERVER + url, data);
     },
 
     async doPut(url, data) {

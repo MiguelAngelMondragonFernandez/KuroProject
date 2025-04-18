@@ -17,10 +17,11 @@ body {
 }
 
 .menubar-custom {
-  width: 100vw;
+  width: 100%;
   background-color: #000000;
   color: #ffffff !important;
-  padding: 1;
+  border-radius: 0px;
+  z-index: 30;
 }
 
 .menubar-custom .p-menubar-start img {
@@ -227,12 +228,13 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #ff0000;
+  background-color: #000000;
   position: relative;
 }
 
 .circle-image img {
-  width: 90px;
+  width: 50px;
+  height: 50px;
 }
 
 .circle-container-admin {
@@ -248,7 +250,8 @@ body {
 }
 
 .circle-admin img {
-  width: 390px;
+  width: 200px;
+  height: 200px;
 }
 
 .custom-input-text {
@@ -272,16 +275,37 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 300px; /* Ajusta el ancho según sea necesario */
+  max-width: 300px;
+}
+
+.loading-text {
+  color: black;
+  font-size: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; 
+  margin: 0; 
+  padding: 5%;
+}
+
+.status-button {
+  width: 130px;
+  color:rgb(0, 0, 0);
+  font-weight: 500;
+  text-align: center;
+
+  display: inline-block;
 }
 
 /* Ícono de búsqueda */
 .search-icon {
   position: absolute;
-  left: 10px; /* Espaciado desde el borde izquierdo */
-  color: #000000; /* Color negro */
-  font-size: 1.2rem; /* Tamaño del ícono */
-  pointer-events: none; /* Evita que el ícono interfiera con el clic */
+  left: 10px;
+  color: #000000;
+  font-size: 1.2rem;
+  pointer-events: none;
 }
 
 /* SweetAlert botones */
