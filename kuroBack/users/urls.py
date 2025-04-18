@@ -15,4 +15,5 @@ urlpatterns = [
     path('getByEmail/<str:email>/', GetUserByEmail.as_view(), name='get_user_by_email'),
     path('updateUser/<int:user_id>/', UpdateUserInfo.as_view(), name='update_user_info'),
     path('changestatus/<int:user_id>/', UpdateIsActive.as_view(), name='update_is_active')
+    path('updatePassword/', UpdatePassword.as_view(), name='update_password')
 ]

@@ -8,6 +8,7 @@ function Message({ idUser, message, date, img }) {
         alignItems: 'center',
         marginBottom: '10px',
         justifyContent: idUser === userId ? 'flex-end' : 'flex-start',
+        marginTop: '10px',
     };
 
     const avatarStyle = {

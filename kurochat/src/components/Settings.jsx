@@ -93,7 +93,38 @@ function Settings({ setState, userData, getUser }) {
             showAlert('error', 'Error', 'No se pudo actualizar el perfil');
         }
     };
+    
+    const changePassword = async () =>{
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const token = user.access_token;
+            const email = user.email;
+            
+            if(newPassword !== confirmPassword){
+                showAlert('error', 'Error', 'Las contraseñas no coinciden');
+                return;
+            }
 
+
+            const updatedData = {
+                email: email,
+                password: newPassword
+            };
+
+            const response = await axios.doPut(`users/updatePassword/`, updatedData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            showAlert('success', 'Contraseña actualizada', 'Tu contraseña ha sido actualizada exitosamente');
+            setIsChangePassword(false);
+        } catch (error) {
+            console.error('Error al actualizar contraseña:', error);
+            showAlert('error', 'Error', 'No se pudo actualizar la contraseña');
+        }
+    }
+    
     const handleColorChange = (e) => {
         const newColor = '#' + e.value;
         changeThemeColor(newColor);
@@ -123,7 +154,7 @@ function Settings({ setState, userData, getUser }) {
             </div>
         );
     };
-    console.log(userData)
+
     useEffect(() => {
         if (userData) {
             setName(userData.name || '');
@@ -225,7 +256,7 @@ function Settings({ setState, userData, getUser }) {
                 </div>
 
                 <div className="flex flex-column pl-4 pr-4 pb-3 border-bottom-1 border-[var(--text-color)]">
-                    <div className="flex flex-column mb-2 mt-3">
+                    <div className="flex flex-column mb-2 mt-3 cursor-pointer">
                         <div className="flex" onClick={toggleConfig}>
                             <i
                                 className="pi pi-cog"
@@ -323,7 +354,7 @@ function Settings({ setState, userData, getUser }) {
 
                 <div className="flex flex-column pl-4 pr-4 pb-3 border-bottom-1 border-[var(--text-color)]">
                     <div className="">
-                        <div className="flex mb-2 mt-3 w-full" onClick={toggleChangePassword}>
+                        <div className="flex mb-2 mt-3 w-full cursor-pointer" onClick={toggleChangePassword}>
                             <i
                                 className="pi pi-lock "
                                 style={{ fontSize: "15px" }}
@@ -344,7 +375,7 @@ function Settings({ setState, userData, getUser }) {
                                         id="name"
                                         style={{ background: "transparent" }}
                                         className="border-1 "
-                                        value={name}
+                                        value={odlPassword}
                                         onChange={(e) => setOldPassword(e.target.value)}
                                     />
                                     <label
@@ -360,7 +391,7 @@ function Settings({ setState, userData, getUser }) {
                                     <InputText
                                         id="first_name"
                                         style={{ background: "transparent" }}
-                                        value={firstName}
+                                        value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
                                     />
                                     <label
@@ -376,7 +407,7 @@ function Settings({ setState, userData, getUser }) {
                                     <InputText
                                         id="last_name"
                                         style={{ background: "transparent" }}
-                                        value={latsName}
+                                        value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                     />
                                     <label
@@ -392,7 +423,7 @@ function Settings({ setState, userData, getUser }) {
                                     icon="pi pi-save"
                                     label={translations.save}
                                     className="w-full"
-                                    onClick={handleUpdateUser}
+                                    onClick={changePassword}
                                     style={{
                                         color: "Var(--text-color)",
                                         background: "transparent",
@@ -413,7 +444,7 @@ function Settings({ setState, userData, getUser }) {
                     )}
                 </div>
                 </div>
-                <div className="flex align-items-center pt-4 pl-4 pb-4 mt-auto" onClick={handleLougout}>
+                <div className="flex align-items-center pt-4 pl-4 pb-4 mt-auto cursor-pointer" onClick={handleLougout}>
                     <i className='pi pi-sign-out' style={{ fontSize: '20px' }} />
                     <span className="ml-3">{translations.logOut}</span>
                 </div>
