@@ -79,8 +79,10 @@ function Settings({ setState, userData, getUser }) {
                 last_name: latsName,
                 url_photo: photoUrl,
             };
+            console.log(`user :`, userData);
+            
 
-            const response = await axios.doPut(`users/updateUser/`, updatedData);
+            const response = await axios.doPut(`users/updateUser/${userData.id}/`, updatedData);
 
             showAlert('success', 'Datos actualizados', 'Tu perfil ha sido actualizado exitosamente');
             setIsEditing(false);

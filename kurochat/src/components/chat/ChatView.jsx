@@ -4,7 +4,6 @@ import { InputText } from 'primereact/inputtext';
 import Message from './Message';
 import axios from '../../utils/httpgateway';
 import * as a from 'axios';
-
 export const ChatView = ({idChat, name}) => {
     const [isMounted, setIsMounted] = useState(false);
     const [items, setItems] = useState([]);
@@ -15,8 +14,6 @@ export const ChatView = ({idChat, name}) => {
     const virtualScrollerRef = useRef(null);
     const [heartBeat, setHeartBeat] = useState(name);
     const [urlImage, setUrlImage] = useState('');
-
-
     const getMessage = async () => {
         try {
             await axios.doGet('mensajes/get/'+idChat+'/')
@@ -30,21 +27,17 @@ export const ChatView = ({idChat, name}) => {
             console.error('Error al obtener mensajes:', error);
         }
     };
-
     useEffect(() => {
         setIsMounted(true);
     },[])
-
     useEffect(() => {
         getMessage();
     }, [isMounted, idChat]);
-
     useEffect(() => {
         if (virtualScrollerRef.current) {
             virtualScrollerRef.current.scrollToIndex(items.length - 1);
         }
     }, [items]);
-
     const handleSendMessage = async () => {
         const user = JSON.parse(localStorage.getItem('user'));
     
@@ -88,11 +81,9 @@ export const ChatView = ({idChat, name}) => {
             });
     };
     
-
     const handleSendImage = () => {
         fileInputRef.current.click();
     };
-
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -100,7 +91,6 @@ export const ChatView = ({idChat, name}) => {
             
         }
     };
-
     const itemTemplate = (item) => {
         if (!item) return null;
         return (
@@ -112,7 +102,6 @@ export const ChatView = ({idChat, name}) => {
             />
         );
     };
-
     return (
         <>
             <div className="flex flex-row " style={{background:"var(--theme-color)" ,color:"Var(--text-color)"}} >
@@ -130,7 +119,7 @@ export const ChatView = ({idChat, name}) => {
             </div>
             <div className="flex flex-row p-2" style={{ backgroundColor: 'var(--theme-color)', color: 'var(--text-color)', borderColor: 'var(--text-color)' }} >
                 <i
-                    className="pi pi-image cursor-pointer"
+                    className="pi pi-image"
                     style={{ fontSize: '2rem', marginLeft: '10px', marginRight: '15px' }}
                     onClick={handleSendImage}
                     onChange={(e) => setFile(e.target.files[0])}
@@ -149,7 +138,7 @@ export const ChatView = ({idChat, name}) => {
                    maxLength={250}
                 />
                 <i
-                    className="pi pi-send cursor-pointer"
+                    className="pi pi-send"
                     style={{ fontSize: '2rem', marginLeft: '10px' }}
                     onClick={handleSendMessage}
                 ></i>

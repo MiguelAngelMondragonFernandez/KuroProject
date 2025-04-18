@@ -9,7 +9,6 @@ function SideBar({ asignarIdChat }) {
     const [state, setState] = useState("listChats")
     const [showAddUserModal, setShowAddUserModal] = useState(false)
     const [userData, setUserData] = useState(null);
-
     const fetchChats = async () => {
         try {
             const user = JSON.parse(localStorage.getItem("user"));
@@ -17,7 +16,6 @@ function SideBar({ asignarIdChat }) {
                 .then(response => {
                     const { conversaciones } = response.data;
                     setFriends(conversaciones);
-
                 })
                 .catch(error => {
                     console.error("Error al obtener los chats:", error);
@@ -31,20 +29,17 @@ function SideBar({ asignarIdChat }) {
             setUserData(JSON.parse(data));
         }
     });
-
     useEffect(() => {
         getUser();
         fetchChats();
     }, []);
-
     const handleAddUser = (newChat) => {
         setFriends((prevFriends) => [...prevFriends, newChat]);
     };
-
     const itemTemplate = (item) => {
         return (
             <div
-                className="flex p-3 cursor-pointer hover:bg-gray-800 hover:text-white"
+                className="flex p-3 cursor-pointer hover:bg-gray-800"
                 style={{ background: "var(--theme-color)", color: "var(--text-color)" }}
                 onClick={() => asignarIdChat(item.id, item.nombre_conversacion)}
             >
@@ -54,8 +49,9 @@ function SideBar({ asignarIdChat }) {
                     className="border-circle"
                     style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                 />
-                <div className="ml-3 mt-3 " >
-                    <div className="font-bold">{item.nombre_conversacion}</div>
+                <div className="ml-3">
+                    <div className="font-bold text-white">{item.nombre_conversacion}</div>
+                    <div className="text-sm text-gray-400">{item.ultimo_mensaje}</div>
                 </div>
             </div>
         )
@@ -128,5 +124,4 @@ function SideBar({ asignarIdChat }) {
         </>
     )
 }
-
 export default SideBar
