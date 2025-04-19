@@ -1,11 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Button } from "primereact/button";
 import Swal from "sweetalert2";
 import { Image } from 'primereact/image';
 import { useNavigate } from "react-router-dom";
 import EditProfile from "./EditProfile";
 import '../../admin.css'
-import axios, { getToken, logout, getUser } from "../../utils/httpgateway";
+import axios, { logout, getUser } from "../../utils/httpgateway";
 
 const ProfileAdmin = () => {
   const [showModal, setShowModal] = useState(false);
@@ -26,10 +26,6 @@ const ProfileAdmin = () => {
 
   const navigate = useNavigate();
 
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
-  };
 
   const handleSubmit = async (updatedData) => {
     try {
@@ -53,7 +49,6 @@ const ProfileAdmin = () => {
   
       await axios.doPut(`users/updateUser/${getUser().id}/`, updatedProfile);
   
-      // Actualizar el localStorage con los nuevos datos del usuario
       const user = getUser();
       const updatedUser = { ...user, ...updatedProfile };
       localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -99,6 +94,10 @@ const ProfileAdmin = () => {
     });
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  })
+
   return (
     <div className="p-5">
       <h1 className="text-center text-3xl font-bold mb-5 text-color-custom">Perfil del Administrador</h1>
@@ -130,7 +129,6 @@ const ProfileAdmin = () => {
         showModal={showModal}
         setShowModal={setShowModal}
         formData={formData}
-        handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
         setFile={setFile} 
       />

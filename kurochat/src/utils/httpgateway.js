@@ -44,14 +44,13 @@ export default {
         const file = new FormData();
         file.append('file', data);
 
-        // Crear una nueva instancia para esta solicitud con headers específicos
         const formDataInstance = axios.create({
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         });
 
-        return formDataInstance.post(import.meta.env.VITE_URL_SERVERIMG, file);
+        return formDataInstance.post(import.meta.env.VITE_URL_SERVERIMG + '/upload', file);
     },
 
     async doPatch(url, data) {
