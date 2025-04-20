@@ -53,9 +53,10 @@ function Settings({ setState, userData, getUser }) {
             const updatedConfig = { ...configToSave, id: response.data.id };
             updateConfig(updatedConfig);
             localStorage.setItem('config', JSON.stringify(updatedConfig));
-            showAlert('success', 'Configuración guardada', '¡Éxito!');
+            showAlert('success', 'Datos Actualizados', 'Tu configuración ha sido actualizada exitosamente');
         } catch (err) {
             console.error('Error al guardar la configuración:', err);
+            showAlert('error', 'Error', 'No se pudo guardar la configuración');
         }
     };
     const handleUpdateUser = async () => {
@@ -143,7 +144,7 @@ function Settings({ setState, userData, getUser }) {
         localStorage.clear();
         setTimeout(() => {
             navigate('/login');
-            showAlert('success', 'Sesión cerrada', '¡Éxito!');
+            showAlert('success', 'Sesión cerrada', 'Gracias por usar KuroChat');
         }, 2000)
     }
 
@@ -273,8 +274,7 @@ function Settings({ setState, userData, getUser }) {
                                     {translations.changeLanguage}
                                 </span>
                             </div>
-                            <div className="flex mt-1 pl-2">
-                                <Dropdown
+                            <Dropdown
                                     value={languages.find((l) => l.code === config.idioma)}
                                     options={languages}
                                     onChange={handleLanguageChange}
@@ -300,8 +300,6 @@ function Settings({ setState, userData, getUser }) {
                                         }),
                                     }}
                                 />
-                            </div>
-
                             <div className="flex pl-2 mt-4">
                                 <i className="pi pi-palette" style={{ fontSize: "15px" }} />
                                 <span className="ml-3 text-base">
