@@ -16,7 +16,7 @@ function Router() {
     <>
     <div style={{
         backgroundColor: isAdminRoute ? "#F2E1C2" : "#242424", 
-        minHeight: "100vh",
+        minHeight: "80vh",
         transition: "background-color 0.3s ease",
       }}>
       <Routes>
