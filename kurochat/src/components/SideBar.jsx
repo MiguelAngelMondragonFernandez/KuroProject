@@ -9,18 +9,21 @@ function SideBar({ asignarIdChat }) {
     const [state, setState] = useState("listChats")
     const [showAddUserModal, setShowAddUserModal] = useState(false)
     const [userData, setUserData] = useState(null);
+    const [selectedChatId, setSelectedChatId] = useState(null);
+
     const fetchChats = async () => {
         try {
             const user = JSON.parse(localStorage.getItem("user"));
-            await axios.doGet(`conversaciones/get/${user.id}/`)
-                .then(response => {
-                    const { conversaciones } = response.data;
-                    setFriends(conversaciones);
-                })
-                .catch(error => {
-                    console.error("Error al obtener los chats:", error);
-                })
+            const response = await axios.doGet(`conversaciones/get/${user.id}/`);
+            const { conversaciones } = response.data;
+            setFriends(conversaciones); 
         } catch (error) {
+            if (error.response && error.response.status === 404) {
+                console.warn("No hay chats disponibles para este usuario.");
+                setFriends([]); 
+            } else {
+                console.error("Error al obtener los chats:", error);
+            }
         }
     };
     const getUser = (() => {
@@ -37,21 +40,27 @@ function SideBar({ asignarIdChat }) {
         setFriends((prevFriends) => [...prevFriends, newChat]);
     };
     const itemTemplate = (item) => {
+        const defaultPhoto = "https://cdn-icons-png.flaticon.com/512/3128/3128528.png"; 
+        const photoUrl = item.url_photo ? item.url_photo : defaultPhoto; 
+    
         return (
             <div
-                className="flex p-3 cursor-pointer hover:bg-gray-800"
+                className={`flex p-3 cursor-pointer hover:bg-gray-800 hover:text-white ${selectedChatId === item.id ? 'bg-gray-700 text-white' : 'hover:bg-gray-800 hover:text-white'}`}
                 style={{ background: "var(--theme-color)", color: "var(--text-color)" }}
-                onClick={() => asignarIdChat(item.id, item.nombre_conversacion)}
+                onClick={() => {
+                    asignarIdChat(item.id, item.nombre_conversacion)
+                    setSelectedChatId(item.id);
+                }
+                }
             >
                 <img
-                    src={item.url_photo}
+                    src={photoUrl}
                     alt={item.nombre_conversacion}
                     className="border-circle"
                     style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                 />
-                <div className="ml-3">
-                    <div className="font-bold text-white">{item.nombre_conversacion}</div>
-                    <div className="text-sm text-gray-400">{item.ultimo_mensaje}</div>
+                <div className="ml-3 mt-3">
+                    <div className="font-bold">{item.nombre_conversacion}</div>
                 </div>
             </div>
         )
@@ -112,6 +121,8 @@ function SideBar({ asignarIdChat }) {
                                     <AddUser
                                         onClose={() => setShowAddUserModal(false)}
                                         onAddUser={handleAddUser}
+                                        fetchChats={fetchChats}
+                                        friends={friends}
                                     />
                                 </div>
                             </div>
