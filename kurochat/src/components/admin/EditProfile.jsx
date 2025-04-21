@@ -38,14 +38,6 @@ const EditProfile = ({ showModal, setShowModal, formData, handleSubmit, setFile 
           last_name: /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]{2,}$/.test(value) ? null : "Apellido Materno inválido",
         }));
         break;
-      case "email":
-        setErrors((prev) => ({
-          ...prev,
-          email: /^[a-zñA-ZÑ0-9._%+-]{3,}@[a-zA-Z0-9.-]{3,}\.[a-zA-Z]{2,4}$/.test(value)
-            ? null
-            : "Correo inválido",
-        }));
-        break;
       default:
         break;
     }
@@ -56,7 +48,6 @@ const EditProfile = ({ showModal, setShowModal, formData, handleSubmit, setFile 
     if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]{2,}$/.test(localFormData.name)) {newErrors.name = "Nombre inválido";}
     if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]{2,}$/.test(localFormData.first_name)) {newErrors.first_name = "Apellido Paterno inválido";}
     if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]{2,}$/.test(localFormData.last_name)) {newErrors.last_name = "Apellido Materno inválido";}
-    if (!/^[a-zñA-ZÑ0-9._%+-]{3,}@[a-zA-Z0-9.-]{3,}\.[a-zA-Z]{2,4}$/.test(localFormData.email)) {newErrors.email = "Correo inválido";}
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -116,20 +107,6 @@ const EditProfile = ({ showModal, setShowModal, formData, handleSubmit, setFile 
             onChange={handleInputChange}
           />
           {errors.last_name && <small className="text-red-500">{errors.last_name}</small>}
-        </div>
-
-        <div>
-          <label htmlFor="email" className="font-semibold label-spacing">
-            Correo Electrónico:
-          </label>
-          <InputText
-            id="email"
-            placeholder="Ingrese su correo electrónico"
-            className="input-full"
-            value={localFormData.email}
-            onChange={handleInputChange}
-          />
-          {errors.email && <small className="text-red-500">{errors.email}</small>}
         </div>
 
         <div>
