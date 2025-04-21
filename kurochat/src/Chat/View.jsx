@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react';
 import { ChatView } from '../components/chat/ChatView'
 import SideBar from '../components/SideBar'
+import { LanguageContext } from '../components/LanguageContext';
 
 function View() {
+  const {translations} = useContext(LanguageContext);
   const [idChat, setIdChat] = React.useState(null)
   const [nameChat, setNameChat] = React.useState(null)
   const asignarIdChat = (id, name) => {
@@ -18,7 +20,7 @@ function View() {
         idChat ? (
           <div className="flex flex-column col-9 h-full"><ChatView idChat={idChat} name={nameChat} /></div>
         ) : (
-          <div className="flex flex-column col-9 " style={{width: '100vh'}}> No hay un chat seleccionado</div>
+          <div className="flex flex-column col-9 " style={{width: '100vh'}}>{translations.selectChat}</div>
         )
       }
    

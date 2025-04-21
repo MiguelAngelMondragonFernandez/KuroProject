@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect,useContext } from 'react'
 import { VirtualScroller } from 'primereact/virtualscroller';
 import Settings from './Settings';
 import axios from '../utils/httpgateway';
 import AddUser from './AddUser';
+import { LanguageContext } from '../components/LanguageContext';
+
 function SideBar({ asignarIdChat }) {
     const [friends, setFriends] = useState([])
+    const {translations} = useContext(LanguageContext);
     const [isMounted, setIsMounted] = useState(false)
     const [state, setState] = useState("listChats")
     const [showAddUserModal, setShowAddUserModal] = useState(false)
@@ -74,7 +77,7 @@ function SideBar({ asignarIdChat }) {
                         </div>
                         <div style={{ background: "var(--theme-color)", color: "Var(--text-color)" }}>
                             {friends.length === 0 ? (
-                                <div className='text-center text-gray-400 py-10'>No hay chats por el momento</div>
+                                <div className='text-center text-gray-400 py-10'>{translations.chatsList}</div>
                             ) : (
                                 <VirtualScroller
                                     itemSize={100}
@@ -112,6 +115,7 @@ function SideBar({ asignarIdChat }) {
                                     <AddUser
                                         onClose={() => setShowAddUserModal(false)}
                                         onAddUser={handleAddUser}
+                                        fetchChats={fetchChats}
                                     />
                                 </div>
                             </div>
