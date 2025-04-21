@@ -28,12 +28,12 @@ function Register() {
     const SetRegister = async (e) => {
         e.preventDefault()
         var error = false
-        var uploadData = null
+        var uploadData = './default.png'
         if (file) {
             const uploadResponse = await axios.doPostFormData(file)
                 .then(response => { error = false; return response.data; })
                 .catch(err => { console.error('Error al subir la imagen:', err); error = true; return null; });
-            uploadData = uploadResponse ? uploadResponse.path : null;
+            uploadData = uploadResponse ? uploadResponse.path : './default.png';
         }
 
         const Register = {

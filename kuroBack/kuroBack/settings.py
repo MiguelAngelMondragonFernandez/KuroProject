@@ -145,6 +145,6 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 # Usar su correo de UTEZ
-EMAIL_HOST_USER = "20223tn026+Reopeko@utez.edu.mx"
+EMAIL_HOST_USER = "20223tn026+NoReply@utez.edu.mx"
 # Obtener de https://myaccount.google.com/apppasswords
-EMAIL_HOST_PASSWORD = "euue qubr qlwu zlik"
+EMAIL_HOST_PASSWORD = "dfrv tenj wavm cgyp"
