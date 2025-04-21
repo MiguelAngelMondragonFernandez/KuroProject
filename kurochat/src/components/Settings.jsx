@@ -52,7 +52,8 @@ function Settings({ setState, userData, getUser }) {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             const { id: USUARIO_ID } = user;
-            const idConfig = JSON.parse(localStorage.getItem('config')).id;
+            const config = JSON.parse(localStorage.getItem('config'));
+            const { id: idConfig} = config 
             const token = user.access_token;
             const configToSave = { ...config, usuario: USUARIO_ID, id: idConfig };
             const response = await axios.doPut(
