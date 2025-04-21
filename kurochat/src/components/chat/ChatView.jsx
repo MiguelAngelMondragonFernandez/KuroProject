@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef,useContext } from 'react';
 import { VirtualScroller } from 'primereact/virtualscroller';
 import { InputText } from 'primereact/inputtext';
+import { LanguageContext } from '../LanguageContext';
 import Message from './Message';
 import axios from '../../utils/httpgateway';
 import * as a from 'axios';
 export const ChatView = ({idChat, name}) => {
+    
+    const {translations} = useContext(LanguageContext);
     const [isMounted, setIsMounted] = useState(false);
     const [items, setItems] = useState([]);
     const [message, setMessage] = useState('');
@@ -125,7 +128,7 @@ export const ChatView = ({idChat, name}) => {
                     onChange={(e) => setFile(e.target.files[0])}
                 ></i>
                 <InputText
-                    placeholder="Escribe tu mensaje"
+                    placeholder={translations.writeMessage}
                     className="w-full"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}

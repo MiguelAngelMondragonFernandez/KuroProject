@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import Swal from 'sweetalert2';
@@ -6,7 +6,7 @@ import AddUser from "./AddUser";
 import EditUser from "./EditUser";
 import TableUser from "./TableUser";
 import '../../admin.css'
-import axios, { getToken, logout } from "../../utils/httpgateway";
+import axios, { getToken, logout, getUser } from "../../utils/httpgateway";
 
 function UsersAdmin() {
   const [searchValue, setSearchValue] = useState("");
@@ -27,6 +27,7 @@ function UsersAdmin() {
   });
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const currentUser = getUser();
 
   useEffect(() => {
     if (!getToken()) {
@@ -44,6 +45,7 @@ function UsersAdmin() {
           setLoading(false);
         });
     }
+    window.scrollTo(0, 0);
   }, [getToken()]);
 
   if (loading) {
@@ -95,42 +97,6 @@ function UsersAdmin() {
     setFormData({ ...formData, [id]: value });
   };
 
-  const handleSubmit = () => {
-    setShowModal(false);
-    Swal.fire({
-      title: 'Procesando...',
-      text: 'Por favor espera...',
-      icon: 'info',
-      allowOutsideClick: false,
-      showConfirmButton: false,
-      timer: 2000,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-
-    setTimeout(() => {
-      const isSuccess = Math.random() > 0.2; // 80% éxito, 20% error
-
-      if (isSuccess) {
-        Swal.fire({
-          title: '¡Guardado!',
-          text: 'El usuario ha sido guardado exitosamente.',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        });
-      } else {
-        Swal.fire({
-          title: 'Error',
-          text: 'Hubo un problema al guardar el usuario. Inténtalo de nuevo.',
-          icon: 'error',
-          confirmButtonText: 'Aceptar'
-        });
-      }
-    }, 2000);
-  };
-
   const openEditModal = (user) => {
     console.log("Editar usuario:", user);
     setSelectedUser(user);
@@ -143,6 +109,7 @@ function UsersAdmin() {
       url_photo: user.url_photo,
       password: user.password,
     });
+    setFile(null);
     setShowEditModal(true);
   };
 
@@ -220,7 +187,7 @@ function UsersAdmin() {
         return;
       }
 
-      let uploadData = { path: "../assets/default.png" }; // Valor por defecto
+      let uploadData = { path: "../assets/default.png" }; 
       if (file) {
         const uploadResponse = await axios.doPostFormData(file)
           .then(response => response.data)
@@ -282,6 +249,10 @@ function UsersAdmin() {
       const fullName = `${user.name} ${user.first_name} ${user.last_name}`.toLowerCase();
       const email = user.email.toLowerCase();
       const search = searchValue.toLowerCase();
+      if (currentUser && user.email === currentUser.email) {
+        return false;
+      }
+
       return fullName.includes(search) || email.includes(search);
     })
   : [];
@@ -321,6 +292,7 @@ function UsersAdmin() {
         showModal={showModal}
         setShowModal={setShowModal}
         formData={formData}
+        setFormData={setFormData}
         handleInputChange={handleInputChange}
         handleSubmit={handleAddSubmit}
         password={password}
@@ -328,6 +300,7 @@ function UsersAdmin() {
         password1={password1}
         setPassword1={setPassword1}
         setFile={setFile}
+        file={file}
       />
 
       <EditUser
@@ -337,6 +310,7 @@ function UsersAdmin() {
         handleInputChange={handleInputChange}
         handleSubmit={handleEditSubmit}
         setFile={setFile} 
+        file={file}
       />
     </>
   );
