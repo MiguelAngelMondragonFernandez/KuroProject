@@ -10,13 +10,15 @@ import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from "primereact/inputtext";
 import { Button } from 'primereact/button';
 import FileInput from './FileInput'
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 function Settings({ setState, userData, getUser }) {
-    const languages = [
-        { name: "Español", code: "es", flag: "https://flagcdn.com/w40/es.png" },
-        { name: "Inglés", code: "en", flag: "https://flagcdn.com/w40/gb.png" },
-    ];
     const { config, translations, changeLanguage, updateConfig } = useContext(LanguageContext);
+    const languages = [
+        { name: translations.spanish, code: "es", flag: "https://flagcdn.com/w40/es.png" },
+        { name: translations.english, code: "en", flag: "https://flagcdn.com/w40/gb.png" },
+    ];    
     const { themeColor, changeThemeColor } = useTheme();
     const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
@@ -30,6 +32,9 @@ function Settings({ setState, userData, getUser }) {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [file, setFile] = React.useState(null)
     const pathImg = userData.url_photo || "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png";
+
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const toggleEdit = () => {
         setIsEditing(!isEditing);
@@ -48,67 +53,114 @@ function Settings({ setState, userData, getUser }) {
             const user = JSON.parse(localStorage.getItem('user'));
             const { id: USUARIO_ID } = user;
             const idConfig = JSON.parse(localStorage.getItem('config')).id;
+            const token = user.access_token;
             const configToSave = { ...config, usuario: USUARIO_ID, id: idConfig };
-            const response = await axios.doPut(`configuracionesaplicacion/api/${idConfig}/`, configToSave);
+            const response = await axios.doPut(
+                `configuracionesaplicacion/api/${idConfig}/`,
+                configToSave,
+                {
+                    headers: {
+                      Authorization: `Bearer ${token}`
+                    }
+                  }
+              );
             const updatedConfig = { ...configToSave, id: response.data.id };
             updateConfig(updatedConfig);
             localStorage.setItem('config', JSON.stringify(updatedConfig));
-            showAlert('success', 'Datos Actualizados', 'Tu configuración ha sido actualizada exitosamente');
+            showAlert('success',`${translations.cofigData}`, `${translations.dataUser}`);
         } catch (err) {
-            console.error('Error al guardar la configuración:', err);
-            showAlert('error', 'Error', 'No se pudo guardar la configuración');
+            console.error("Error:", err);
+            showAlert('error', `${translations.cofigDataError}`,'Error');
         }
     };
-    const handleUpdateUser = async () => {
+    const profileSchema = Yup.object().shape({
+        name: Yup.string()
+            .required(`${translations.nameObligated}`)
+            .matches(
+                /^[A-Z][a-z]+((\s[A-Z][a-z]+)?)$/,
+                `${translations.mayusLetterName}`
+            )
+            .min(2, `${translations.minLengthName}`)
+            .max(50, `${translations.maxLengthName}`),
+        firstName: Yup.string()
+            .required(`${translations.firstNameObligated}`)
+            .matches(
+                /^[A-Z][a-z]+$/,
+                `${translations.mayusLetterFirstName}`
+            )
+            .min(2, `${translations.minLengthFirstName}`)
+            .max(50, `${translations.maxLengthFirstName}`),
+        lastName: Yup.string()
+            .required(`${translations.lastNameObligated}`)
+            .matches(
+                /^[A-Z][a-z]+$/,
+                `${translations.mayusLetterLastName}`    
+            )
+            .min(2, `${translations.minLengthLastName}`)
+            .max(50, `${translations.maxLengthLastName}`)
+    });
+    
+
+    const handleUpdateUser = async (values) => {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             const token = user.access_token;
 
             var photoUrl = userData.url_photo; // Por defecto usamos la actual
-            // Si hay un nuevo archivo, lo subimos
 
-            if(file){
-            const uploadResponse = await axios.doPostFormData(file).then(response => response.data).catch(error => {
-                console.error('Error al subir la imagen:', error); return null;
-            })
-            photoUrl = uploadResponse?.path || "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png";
-        }
+            if (file) {
+                const uploadResponse = await axios.doPostFormData(file).then(response => response.data).catch(error => {
+                    console.error('Error', error); return null;
+                })
+                photoUrl = uploadResponse?.path || "https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png";
+            }
+
+            // Usamos los valores del formulario proporcionados por Formik
             const updatedData = {
                 email: user.email,
-                name,
-                first_name: firstName,
-                last_name: latsName,
+                name: values.name,
+                first_name: values.firstName,
+                last_name: values.lastName,
                 url_photo: photoUrl,
             };
-            console.log(`user :`, userData);
-            
 
             const response = await axios.doPut(`users/updateUser/${userData.id}/`, updatedData);
 
-            showAlert('success', 'Datos actualizados', 'Tu perfil ha sido actualizado exitosamente');
+            showAlert('success', `${translations.infoUser}`, `${translations.dataUser}`);
             setIsEditing(false);
             const updatedUser = { ...user, ...updatedData };
             localStorage.setItem('user', JSON.stringify(updatedUser));
             getUser();
             setFile(null);
         } catch (error) {
-            console.error('Error al actualizar usuario:', error);
-            showAlert('error', 'Error', 'No se pudo actualizar el perfil');
+            console.error("Error: ", error);
+            showAlert('error', `${translations.dataUserError}`,'Error', );
         }
     };
-    
-    const changePassword = async () =>{
+
+    const passwordSchema = Yup.object().shape({
+        newPassword: Yup.string()
+            .required(`${translations.passwordObligated}`)
+            .min(8,`${translations.minLengthPass}`)
+            .matches(/[a-z]/, `${translations.lowercaseLetterPassword}`)
+            .matches(/[A-Z]/, `${translations.mayusLetterPassword}`)
+            .matches(/\d/, `${translations.numberPassword}`)
+            .matches(/[!@#$%^&*()_+[\]{};':"\\|,.<>/?-]/,  `${translations.specialCharacterPassword}`),
+        confirmPassword: Yup.string()
+            .required(`${translations.confirmPassword}`)
+            .oneOf([Yup.ref('newPassword'), null], `${translations.comparePassword}`),
+    });
+
+    const changePassword = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             const token = user.access_token;
             const email = user.email;
-            
-            if(newPassword !== confirmPassword){
-                showAlert('error', 'Error', 'Las contraseñas no coinciden');
+
+            if (newPassword !== confirmPassword) {
+                showAlert('error',  `${translations.comparePassword}`,'Error');
                 return;
             }
-
-
             const updatedData = {
                 email: email,
                 password: newPassword
@@ -119,15 +171,14 @@ function Settings({ setState, userData, getUser }) {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
-            showAlert('success', 'Contraseña actualizada', 'Tu contraseña ha sido actualizada exitosamente');
+            showAlert('success', `${translations.Password}`,`${translations.dataPassword}`);
             setIsChangePassword(false);
         } catch (error) {
-            console.error('Error al actualizar contraseña:', error);
-            showAlert('error', 'Error', 'No se pudo actualizar la contraseña');
+            console.error("Error: ", error);
+            showAlert('error',  `${translations.dataPasswordError}`,"Error");
         }
     }
-    
+
     const handleColorChange = (e) => {
         const newColor = '#' + e.value;
         changeThemeColor(newColor);
@@ -140,11 +191,11 @@ function Settings({ setState, userData, getUser }) {
     };
 
     const handleLougout = async () => {
-        showAlert('loading', 'Cerrando sesión', 'Por favor, espera...');
+        showAlert('loading', `${translations.loading}`,`${translations.waitLogOut}`);
         localStorage.clear();
         setTimeout(() => {
             navigate('/login');
-            showAlert('success', 'Sesión cerrada', 'Gracias por usar KuroChat');
+            showAlert('success', `${translations.thanks}`,`${translations.sessionLogOut}`,  );
         }, 2000)
     }
 
@@ -183,98 +234,130 @@ function Settings({ setState, userData, getUser }) {
                     </span>
                 </div>
                 <div className='flex-1 overflow-y-auto '>
-                <div className="flex w-full  border-[var(--text-color)] border-bottom-1 ">
-                    <div className='flex flex-column'>
-                        <div id='Profile' className={`${isEditing ? 'hidden' : ''} pb-3 pl-4 `} >
-                            <div className='flex mb-2 mt-3 w-full'>
-                                <span className='text-sm'>{translations.profile}</span>
-                            </div>
-                            <div className='flex flex-column w-full align-items-center justify-content-center'>
-                                <img className='border-circle w-6rem h-6rem ' src={pathImg} alt="" srcset="" />
-
-                                <div className="flex w-full text-center align-items-center justify-content-center">
-                                    <span className='ml-3 text-sm font-normal'>{userData.email}</span>
+                    <div className="flex w-full  border-[var(--text-color)] border-bottom-1 ">
+                        <div className='flex flex-column'>
+                            <div id='Profile' className={`${isEditing ? 'hidden' : ''} pb-3 pl-4 `} >
+                                <div className='flex mb-2 mt-3 w-full'>
+                                    <span className='text-sm'>{translations.profile}</span>
                                 </div>
-                                <div className='flex text-center'>
-                                    <span className='ml-2 text-lg font-semibold'>{userData.name} {userData.first_name} {userData.last_name}</span>
-                                    <i className='pi pi-pencil  mt-2' style={{ fontSize: '15px' }} onClick={toggleEdit} />
-                                </div>
+                                <div className='flex flex-column w-full align-items-center justify-content-center'>
+                                    <img className='border-circle w-6rem h-6rem ' src={pathImg} alt="" srcSet="" />
 
+                                    <div className="flex w-full text-center align-items-center justify-content-center">
+                                        <span className='ml-3 text-sm font-normal'>{userData.email}</span>
+                                    </div>
+                                    <div className='flex text-center'>
+                                        <span className='ml-2 text-lg font-semibold'>{userData.name} {userData.first_name} {userData.last_name}</span>
+                                        <i className='pi pi-pencil  mt-2' style={{ fontSize: '15px' }} onClick={toggleEdit} />
+                                    </div>
+
+                                </div>
                             </div>
+                            {isEditing && (
+                                <div id='editProfile' className={`${isEditing ? '' : 'hidden'} pb-3 pl-4 `}>
+                                    <div className='mb-2 mt-3 w-full'>
+                                        <i className='pi pi-user-edit ' style={{ fontSize: '15px' }} />
+                                        <span className='ml-3 text-sm'>{translations.editProfile}</span>
+                                    </div>
+                                    <div className="flex pl-5 pb-7">
+                                        <FileInput File={asignarArchivo} defaultImage={pathImg} className="w-6rem h-6rem " />
+                                    </div>
+
+                                    <Formik
+                                        initialValues={{
+                                            name: userData.name || '',
+                                            firstName: userData.first_name || '',
+                                            lastName: userData.last_name || ''
+                                        }}
+                                        validationSchema={profileSchema}
+                                        onSubmit={handleUpdateUser}
+                                    >
+                                        {({ errors, touched }) => (
+                                            <Form>
+                                                <div className="flex flex-column mb-5">
+                                                    <FloatLabel className="w-full">
+                                                        <Field
+                                                            as={InputText}
+                                                            id="name"
+                                                            name="name"
+                                                            style={{ background: 'transparent' }}
+                                                            className={`border-1 w-full ${errors.name && touched.name ? 'p-invalid' : ''}`}
+                                                        />
+                                                        <label htmlFor="name" style={{ color: "var(--text-color)" }}>{translations.name}</label>
+                                                    </FloatLabel>
+                                                    <ErrorMessage name="name" component="div" className="text-red-500 text-xs mt-1" />
+                                                </div>
+
+                                                <div className="flex flex-column mb-5">
+                                                    <FloatLabel className="w-full">
+                                                        <Field
+                                                            as={InputText}
+                                                            id="firstName"
+                                                            name="firstName"
+                                                            style={{ background: 'transparent' }}
+                                                            className={`w-full ${errors.firstName && touched.firstName ? 'p-invalid' : ''}`}
+                                                        />
+                                                        <label htmlFor="firstName" style={{ color: "var(--text-color)" }}>{translations.first_name}</label>
+                                                    </FloatLabel>
+                                                    <ErrorMessage name="firstName" component="div" className="text-red-500 text-xs mt-1" />
+                                                </div>
+
+                                                <div className="flex flex-column mb-4">
+                                                    <FloatLabel className="w-full">
+                                                        <Field
+                                                            as={InputText}
+                                                            id="lastName"
+                                                            name="lastName"
+                                                            style={{ background: 'transparent' }}
+                                                            className={`w-full ${errors.lastName && touched.lastName ? 'p-invalid' : ''}`}
+                                                        />
+                                                        <label htmlFor="lastName" style={{ color: "var(--text-color)" }}>{translations.last_name}</label>
+                                                    </FloatLabel>
+                                                    <ErrorMessage name="lastName" component="div" className="text-red-500 text-xs mt-1" />
+                                                </div>
+
+                                                <div className="flex gap-2 mt-3">
+                                                    <Button
+                                                        icon="pi pi-save"
+                                                        label={translations.save}
+                                                        className='w-full'
+                                                        type="submit"
+                                                        style={{ color: "Var(--text-color)", background: 'transparent' }}
+                                                    />
+                                                    <Button
+                                                        icon="pi pi-times"
+                                                        label={translations.cancelacion}
+                                                        className='w-full'
+                                                        style={{ color: "Var(--text-color)", background: 'transparent' }}
+                                                        onClick={toggleEdit}
+                                                        type="button"
+                                                    />
+                                                </div>
+                                            </Form>
+                                        )}
+                                    </Formik>
+                                </div>
+                            )}
                         </div>
-                        {isEditing && (
-                            <div id='editProfile' className={`${isEditing ? '' : 'hidden'} pb-3 pl-4 `}>
-                                <div className='mb-2 mt-3 w-full'>
-                                    <i className='pi pi-user-edit ' style={{ fontSize: '15px' }} />
-                                    <span className='ml-3 text-sm'>{translations.editProfile}</span>
-                                </div>
-                                <div className="flex pl-5 pb-7">
-                                    <FileInput File={asignarArchivo} defaultImage={pathImg} className="w-6rem h-6rem " />
-                                </div>
-                                <div className='flex mt-5 mb-3 '>
-                                    <FloatLabel>
-                                        <InputText id="name" style={{ background: 'transparent' }}
-                                            className='border-1 '
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)} />
-                                        <label htmlFor="name" style={{ color: "Var(--text-color)" }}>{translations.name}</label>
-                                    </FloatLabel>
-                                </div>
-                                <div className='flex mt-5 mb-3'>
-                                    <FloatLabel>
-                                        <InputText id="first_name" style={{ background: 'transparent' }}
-                                            value={firstName}
-                                            onChange={(e) => setFirstName(e.target.value)}
-                                        />
-                                        <label htmlFor="first_name" style={{ color: "Var(--text-color)" }}>{translations.first_name}</label>
-                                    </FloatLabel>
-                                </div>
-                                <div className='flex mt-5 mb-3'>
-                                    <FloatLabel>
-                                        <InputText id="last_name" style={{ background: 'transparent' }}
-                                            value={latsName}
-                                            onChange={(e) => setLastName(e.target.value)} />
-                                        <label htmlFor="last_name" style={{ color: "Var(--text-color)" }}>{translations.last_name}</label>
-                                    </FloatLabel>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button
-                                        icon="pi pi-save"
-                                        label={translations.save}
-                                        className='w-full'
-                                        onClick={handleUpdateUser}
-                                        style={{ color: "Var(--text-color)", background: 'transparent' }}
-                                    />
-                                    <Button
-                                        icon="pi pi-times"
-                                        label={translations.cancelacion}
-                                        className='w-full'
-                                        style={{ color: "Var(--text-color)", background: 'transparent' }}
-                                        onClick={toggleEdit}
-                                    />
-                                </div>
-                            </div>
-                        )}
                     </div>
-                </div>
 
-                <div className="flex flex-column pl-4 pr-4 pb-3 border-bottom-1 border-[var(--text-color)]">
-                    <div className="flex flex-column mb-2 mt-3 cursor-pointer">
-                        <div className="flex" onClick={toggleConfig}>
-                            <i
-                                className="pi pi-cog"
-                                style={{ fontSize: "15px" }}
-                            />
-                            <span className="ml-3  text-sm">{translations.configuration}</span>
-                        </div>
-                        <div className={`${isConfig ? "" : "hidden"} pb-3 `}>
-                            <div className="flex pl-2 mt-3">
-                                <i className="pi pi-globe" style={{ fontSize: "15px" }} />
-                                <span className="ml-3 text-base ">
-                                    {translations.changeLanguage}
-                                </span>
+                    <div className="flex flex-column pl-4 pr-4 pb-3 border-bottom-1 border-[var(--text-color)]">
+                        <div className="flex flex-column mb-2 mt-3 cursor-pointer">
+                            <div className="flex" onClick={toggleConfig}>
+                                <i
+                                    className="pi pi-cog"
+                                    style={{ fontSize: "15px" }}
+                                />
+                                <span className="ml-3  text-sm">{translations.configuration}</span>
                             </div>
-                            <Dropdown
+                            <div className={`${isConfig ? "" : "hidden"} pb-3 `}>
+                                <div className="flex pl-2 mt-3">
+                                    <i className="pi pi-globe" style={{ fontSize: "15px" }} />
+                                    <span className="ml-3 text-base ">
+                                        {translations.changeLanguage}
+                                    </span>
+                                </div>
+                                <Dropdown
                                     value={languages.find((l) => l.code === config.idioma)}
                                     options={languages}
                                     onChange={handleLanguageChange}
@@ -300,149 +383,178 @@ function Settings({ setState, userData, getUser }) {
                                         }),
                                     }}
                                 />
-                            <div className="flex pl-2 mt-4">
-                                <i className="pi pi-palette" style={{ fontSize: "15px" }} />
-                                <span className="ml-3 text-base">
-                                    {translations.changeColor}
+                                <div className="flex pl-2 mt-4">
+                                    <i className="pi pi-palette" style={{ fontSize: "15px" }} />
+                                    <span className="ml-3 text-base">
+                                        {translations.changeColor}
+                                    </span>
+                                </div>
+                                <ColorPicker
+                                    id="color"
+                                    value={themeColor.replace("#", "")}
+                                    onChange={handleColorChange}
+                                    className="w-full "
+                                    pt={{
+                                        root: {
+                                            className: "border-0",
+                                        },
+                                        input: {
+                                            className: "w-full mt-1",
+                                            style: {
+                                                border: `2px solid var(--text-color)`,
+                                                borderRadius: "6px",
+                                                padding: "4px",
+                                                transition: "all 0.3s ease",
+                                            },
+                                        },
+                                    }}
+                                />
+                                <div className="flex gap-2 mt-5">
+                                    <Button
+                                        icon="pi pi-save"
+                                        label={translations.save}
+                                        className="w-full "
+                                        onClick={updateConfiguracion}
+                                        style={{
+                                            color: "Var(--text-color)",
+                                            background: "transparent",
+                                        }}
+                                    />
+                                    <Button
+                                        icon="pi pi-times"
+                                        label={translations.cancelacion}
+                                        className="w-full"
+                                        style={{
+                                            color: "Var(--text-color)",
+                                            background: "transparent",
+                                        }}
+                                        onClick={toggleConfig}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-column pl-4 pr-4 pb-3 border-bottom-1 border-[var(--text-color)]">
+                        <div className="">
+                            <div className="flex mb-2 mt-3 w-full cursor-pointer" onClick={toggleChangePassword}>
+                                <i
+                                    className="pi pi-lock "
+                                    style={{ fontSize: "15px" }}
+                                />
+                                <span className="ml-3 text-sm">
+                                    {translations.changePassword}
                                 </span>
                             </div>
-                            <ColorPicker
-                                id="color"
-                                value={themeColor.replace("#", "")}
-                                onChange={handleColorChange}
-                                className="w-full "
-                                pt={{
-                                    root: {
-                                        className: "border-0",
-                                    },
-                                    input: {
-                                        className: "w-full mt-1",
-                                        style: {
-                                            border: `2px solid var(--text-color)`,
-                                            borderRadius: "6px",
-                                            padding: "4px",
-                                            transition: "all 0.3s ease",
-                                        },
-                                    },
+                        </div>
+                        {isChangePassword && (
+                            <Formik
+                                initialValues={{
+                                    newPassword: '',
+                                    confirmPassword: '',
                                 }}
-                            />
-                            <div className="flex gap-2 mt-5">
-                                <Button
-                                    icon="pi pi-save"
-                                    label={translations.save}
-                                    className="w-full "
-                                    onClick={updateConfiguracion}
-                                    style={{
-                                        color: "Var(--text-color)",
-                                        background: "transparent",
-                                    }}
-                                />
-                                <Button
-                                    icon="pi pi-times"
-                                    label={translations.cancelacion}
-                                    className="w-full"
-                                    style={{
-                                        color: "Var(--text-color)",
-                                        background: "transparent",
-                                    }}
-                                    onClick={toggleConfig}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                validationSchema={passwordSchema}
+                                onSubmit={(values) => {
+                                    setNewPassword(values.newPassword);
+                                    setConfirmPassword(values.confirmPassword);
+                                    changePassword();
+                                }}
+                            >
+                                {({ handleSubmit }) => (
+                                    <Form onSubmit={handleSubmit}>
+                                        <div className="flex mt-5 mb-3 relative">
+                                            <FloatLabel className="w-full">
+                                                <Field
+                                                    as={InputText}
+                                                    type={showNewPassword ? "text" : "password"}
+                                                    id="newPassword"
+                                                    name="newPassword"
+                                                    style={{
+                                                        background: "transparent",
+                                                        paddingRight: "2.5rem" // espacio para el ojito
+                                                    }}
+                                                    className="w-full"
+                                                />
+                                                <label htmlFor="newPassword" style={{ color: "var(--text-color)" }}>
+                                                    {translations.newPassword}
+                                                </label>
+                                                <i
+                                                    className={`pi ${showNewPassword ? 'pi-eye-slash' : 'pi-eye'} cursor-pointer`}
+                                                    onClick={() => setShowNewPassword(!showNewPassword)}
+                                                    style={{
+                                                        fontSize: '1.2rem',
+                                                        color: 'var(--text-color)',
+                                                        position: 'absolute',
+                                                        top: '50%',
+                                                        right: '0.75rem',
+                                                        transform: 'translateY(-50%)'
+                                                    }}
+                                                />
+                                            </FloatLabel>
+                                        </div>
 
-                <div className="flex flex-column pl-4 pr-4 pb-3 border-bottom-1 border-[var(--text-color)]">
-                    <div className="">
-                        <div className="flex mb-2 mt-3 w-full cursor-pointer" onClick={toggleChangePassword}>
-                            <i
-                                className="pi pi-lock "
-                                style={{ fontSize: "15px" }}
-                            />
-                            <span className="ml-3 text-sm">
-                                {translations.changePassword}
-                            </span>
-                        </div>
-                    </div>
-                    {isChangePassword && (
-                        <div
+                                        <ErrorMessage name="newPassword" component="div" className="text-red-500 text-sm" />
+                                        <div className="flex mt-5 mb-3 relative">
 
-                            className={`${isChangePassword ? "" : "hidden"} pb-3 pl-4 `}
-                        >
-                            <div className="flex mt-5 mb-3 ">
-                                <FloatLabel>
-                                    <InputText
-                                        id="name"
-                                        style={{ background: "transparent" }}
-                                        className="border-1 "
-                                        value={odlPassword}
-                                        onChange={(e) => setOldPassword(e.target.value)}
-                                    />
-                                    <label
-                                        htmlFor="name"
-                                        style={{ color: "Var(--text-color)" }}
-                                    >
-                                        {translations.oldPassword}
-                                    </label>
-                                </FloatLabel>
-                            </div>
-                            <div className="flex mt-5 mb-3">
-                                <FloatLabel>
-                                    <InputText
-                                        id="first_name"
-                                        style={{ background: "transparent" }}
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                    />
-                                    <label
-                                        htmlFor="first_name"
-                                        style={{ color: "Var(--text-color)" }}
-                                    >
-                                        {translations.newPassword}
-                                    </label>
-                                </FloatLabel>
-                            </div>
-                            <div className="flex mt-5 mb-3">
-                                <FloatLabel>
-                                    <InputText
-                                        id="last_name"
-                                        style={{ background: "transparent" }}
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                    />
-                                    <label
-                                        htmlFor="last_name"
-                                        style={{ color: "Var(--text-color)" }}
-                                    >
-                                        {translations.confirmPassword}
-                                    </label>
-                                </FloatLabel>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button
-                                    icon="pi pi-save"
-                                    label={translations.save}
-                                    className="w-full"
-                                    onClick={changePassword}
-                                    style={{
-                                        color: "Var(--text-color)",
-                                        background: "transparent",
-                                    }}
-                                />
-                                <Button
-                                    icon="pi pi-times"
-                                    label={translations.cancelacion}
-                                    className="w-full"
-                                    style={{
-                                        color: "Var(--text-color)",
-                                        background: "transparent",
-                                    }}
-                                    onClick={toggleChangePassword}
-                                />
-                            </div>
-                        </div>
-                    )}
-                </div>
+                                            <FloatLabel className="w-full">
+                                                <Field
+                                                    as={InputText}
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    id="confirmPassword"
+                                                    name="confirmPassword"
+                                                    className="w-full"
+                                                    style={{
+                                                        background: "transparent",
+                                                        paddingRight: "2.5rem"
+                                                    }}
+
+                                                />
+                                                <label htmlFor="confirmPassword" style={{ color: "Var(--text-color)" }}>
+                                                    {translations.confirmPassword}
+                                                </label>
+                                                <i
+                                                    className={`pi ${showConfirmPassword ? 'pi-eye-slash' : 'pi-eye'} absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer`}
+                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                    style={{
+                                                        fontSize: '1.2rem',
+                                                        color: 'var(--text-color)',
+                                                        position: 'absolute',
+                                                        top: '50%',
+                                                        right: '0.75rem',
+                                                        transform: 'translateY(-50%)'
+                                                    }}
+                                                />
+                                            </FloatLabel>                                        </div>
+                                        <ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm" />
+
+                                        <div className="flex gap-2 mt-4">
+                                            <Button
+                                                icon="pi pi-save"
+                                                label={translations.save}
+                                                className="w-full"
+                                                type="submit"
+                                                onClick={changePassword}
+                                                style={{
+                                                    color: "Var(--text-color)",
+                                                    background: "transparent",
+                                                }}
+                                            />
+                                            <Button
+                                                icon="pi pi-times"
+                                                label={translations.cancelacion}
+                                                className="w-full"
+                                                style={{
+                                                    color: "Var(--text-color)",
+                                                    background: "transparent",
+                                                }}
+                                                onClick={toggleChangePassword}
+                                            />
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
+                        )}
+                    </div>
                 </div>
                 <div className="flex align-items-center pt-4 pl-4 pb-4 mt-auto cursor-pointer" onClick={handleLougout}>
                     <i className='pi pi-sign-out' style={{ fontSize: '20px' }} />

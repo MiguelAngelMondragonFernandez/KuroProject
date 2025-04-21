@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import axios from '../utils/httpgateway';
+import { LanguageContext } from '../components/LanguageContext';
+import { showAlert } from '../utils/alerts';
 
-const AddUser = ({ onClose, onAddUser }) => {
-    const [email, setEmail] = useState("")
+const AddUser = ({ onClose, onAddUser,fetchChats }) => {
     const [groupName, setGroupName] = useState("");
     const [loading, setLoading] = useState(false);
     const [emails, setEmails] = useState([""]);
+    const { translations } = useContext(LanguageContext);
 
     const handleAddEmailField = () => {
         setEmails([...emails, '']);
@@ -34,11 +36,10 @@ const AddUser = ({ onClose, onAddUser }) => {
                         return response.data.id;
                     })
             );
-            ids.push(user.id); 
+            ids.push(user.id);
             return ids.join(',');
         } catch (error) {
             console.error('Error al obtener los IDs de los correos:', error);
-            alert('Hubo un error al buscar los correos electrónicos.');
             throw error;
         }
     };
@@ -48,44 +49,39 @@ const AddUser = ({ onClose, onAddUser }) => {
         const userEmail = userId.email;
 
         if (emails.some(email => email.trim() === '')) {
-            alert('Por favor, completa todos los campos de correo.');
+            showAlert('error', 'Por favor, completa todos los campos de correo.', 'Campos incompletos');
             return;
         }
 
         if (emails.length > 1 && groupName.trim() === '') {
-            alert('Por favor, ingresa el nombre del grupo.');
+            showAlert('error', 'Error',translations.nameGroupObligated);
             return;
         }
 
         if (emails.includes(userEmail)) {
-            alert('No puedes incluirte a ti mismo en la lista de correos.');
+            showAlert('error', translations.friendsEmailMyself, 'Error');
             return;
         }
 
         setLoading(true);
 
         try {
+            showAlert('loading', `${translations.wait}`,`${translations.chatCreating} `);
             const emailIds = await fetchEmailIds();
-            console.log("Ids", emailIds);
-            console.log("Datos enviados al backend:", {
-                participantes: emailIds,
-                alias_grupo: emails.length > 1 ? groupName : '',
-            });
             const response = await axios.doPost('conversaciones/create/', {
                 participantes: emailIds,
                 alias_grupo: emails.length > 1 ? groupName : '',
             });
 
-            alert('Chat creado exitosamente.');
+            showAlert('success', translations.chatCreate, translations.chatCreate );
             onAddUser(response.data);
             setEmails(['']);
             setGroupName('');
             onClose();
+            fetchChats();
         } catch (error) {
-            console.error('Error al crear el chat:', error);
-            alert('Hubo un error al crear el chat.');
-
-
+            console.error("Error", error);
+            showAlert('error', translations.chatCreateError, 'Error');
         } finally {
             setLoading(false);
         }
@@ -93,16 +89,16 @@ const AddUser = ({ onClose, onAddUser }) => {
 
     return (
         <div className="p-5">
-            <h2 className="text-lg font-bold mb-4">Agregar Usuario</h2>
+            <h2 className="text-lg font-bold mb-4">{translations.addFriend}</h2>
             {emails.length > 1 && (
                 <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1">Nombre del Grupo</label>
+                    <label className="block text-sm font-medium mb-1">{translations.nameGroup}</label>
                     <input
                         type="text"
                         className="w-full p-2 border rounded"
                         value={groupName}
                         onChange={(e) => setGroupName(e.target.value)}
-                        placeholder="Ingresa el nombre del grupo"
+                        placeholder={translations.inputGroup}
                     />
                 </div>
             )}
@@ -113,7 +109,7 @@ const AddUser = ({ onClose, onAddUser }) => {
                         className="w-full p-2 border rounded"
                         value={email}
                         onChange={(e) => handleEmailChange(index, e.target.value)}
-                        placeholder={`Correo electrónico ${index + 1}`}
+                        placeholder={`${translations.friendsEmail} ${index + 1}`}
                     />
                     {index > 0 && (
                         <button
@@ -126,29 +122,29 @@ const AddUser = ({ onClose, onAddUser }) => {
                 </div>
             ))}
             <button
-                className="bg-green-500 text-white px-4 py-2 rounded mb-3"
+                className="bg-green-500 w-full text-white px-4 py-2 rounded mb-3"
                 onClick={handleAddEmailField}
             >
-                + Agregar otro correo
+                + {translations.addAnother}
             </button>
             <div className="flex justify-end">
                 <button
-                    className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+                    className="bg-gray-500 w-full text-white px-4 py-2 rounded mr-2"
                     onClick={onClose}
                     disabled={loading}
                 >
-                    Cancelar
+                    {translations.cancelacion}
                 </button>
                 <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                    className="bg-blue-500 w-full text-white px-4 py-2 rounded"
                     onClick={handleCreateGroup}
                     disabled={loading}
                 >
-                    {loading ? 'Creando...' : 'Crear Chat'}
+                    {loading ? translations.wait : translations.save}
                 </button>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default AddUser
+export default AddUser;
