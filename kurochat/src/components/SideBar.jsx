@@ -11,10 +11,12 @@ function SideBar({ asignarIdChat }) {
     const [isMounted, setIsMounted] = useState(false)
     const [state, setState] = useState("listChats")
     const [showAddUserModal, setShowAddUserModal] = useState(false)
+    const [update, setUpdate] = useState(false)
     const [userData, setUserData] = useState(null);
+            const user = JSON.parse(localStorage.getItem("user"));
+
     const fetchChats = async () => {
         try {
-            const user = JSON.parse(localStorage.getItem("user"));
             await axios.doGet(`conversaciones/get/${user.id}/`)
                 .then(response => {
                     const { conversaciones } = response.data;
@@ -32,14 +34,23 @@ function SideBar({ asignarIdChat }) {
             setUserData(JSON.parse(data));
         }
     });
+
+    useEffect(()=>{
+        setIsMounted(true);
+    },[])
+
     useEffect(() => {
+        if (isMounted){
         getUser();
         fetchChats();
-    }, []);
+    }
+    }, [isMounted]);
     const handleAddUser = (newChat) => {
         setFriends((prevFriends) => [...prevFriends, newChat]);
     };
     const itemTemplate = (item) => {
+        console.log(item);
+        
         return (
             <div
                 className="flex p-3 cursor-pointer hover:bg-gray-800"
@@ -59,6 +70,11 @@ function SideBar({ asignarIdChat }) {
             </div>
         )
     }
+
+    
+    useEffect(()=>{
+        fetchChats();
+    },[update])
     return (
         <>
             {
@@ -116,6 +132,7 @@ function SideBar({ asignarIdChat }) {
                                         onClose={() => setShowAddUserModal(false)}
                                         onAddUser={handleAddUser}
                                         fetchChats={fetchChats}
+                                        friends={friends}
                                     />
                                 </div>
                             </div>

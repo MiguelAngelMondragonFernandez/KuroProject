@@ -7,7 +7,7 @@ const app = express();
 
 // Habilitar CORS antes de definir las rutas
 app.use(cors({
-  origin: ['http://localhost:4000', 'http://localhost:5173'], // Agrega los dominios permitidos
+  origin: ['http://localhost:4000', 'http://localhost:5173', 'http://192.168.107.12:5173'], // Agrega los dominios permitidos
   methods: ['POST'],
   allowedHeaders: ['Content-Type']
 }));

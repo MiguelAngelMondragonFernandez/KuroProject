@@ -7,6 +7,8 @@ function View() {
   const {translations} = useContext(LanguageContext);
   const [idChat, setIdChat] = React.useState(null)
   const [nameChat, setNameChat] = React.useState(null)
+  const [isMounted, setIsMounted] = React.useState(false)
+
   const asignarIdChat = (id, name) => {
     setIdChat(id);
     setNameChat(name);

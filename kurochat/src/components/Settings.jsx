@@ -35,6 +35,7 @@ function Settings({ setState, userData, getUser }) {
 
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const user = JSON.parse(localStorage.getItem('user'));
 
     const toggleEdit = () => {
         setIsEditing(!isEditing);
@@ -556,6 +557,9 @@ function Settings({ setState, userData, getUser }) {
                             </Formik>
                         )}
                     </div>
+                    {
+                        user.is_staff && ( <Button label='Ver panel de admin' onClick={()=>{navigate('/admin')}}  style={{background: 'transparent', color: 'gold'}} />)
+                    }
                 </div>
                 <div className="flex align-items-center pt-4 pl-4 pb-4 mt-auto cursor-pointer" onClick={handleLougout}>
                     <i className='pi pi-sign-out' style={{ fontSize: '20px' }} />

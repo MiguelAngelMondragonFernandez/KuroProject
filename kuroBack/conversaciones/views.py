@@ -35,7 +35,7 @@ class getConversacionesByIdUser(APIView):
                             other_user_name = cursor.fetchone()
                             alias_grupo = other_user_name[0] + ' ' + other_user_name[1] if other_user_name else "Desconocido"
                             url_photo = other_user_name[2] if other_user_name else None
-                    rows.append({"id": id_conversacion, "nombre_conversacion": alias_grupo, "url_photo": url_photo})
+                    rows.append({"id": id_conversacion, "nombre_conversacion": alias_grupo, "url_photo": url_photo, "participantes": participantes.split(',')})
                 if not rows:
                     return Response({"error": "No se encontraron conversaciones"}, status=404)
                 return Response({"conversaciones": rows}, status=200)
@@ -48,7 +48,7 @@ class CreateGroup(APIView):
         try:
             participantes = request.data.get('participantes') 
             alias_grupo = request.data.get('alias_grupo') 
-
+            url_photo = request.data.get('url_photo')
             if not participantes:
                 return Response({"error": "La lista de participantes es obligatoria."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -57,8 +57,8 @@ class CreateGroup(APIView):
 
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO conversaciones_conversacion ( alias_grupo, participantes) VALUES (%s, %s)",
-                    [alias_grupo, participantes]
+                    "INSERT INTO conversaciones_conversacion ( alias_grupo, participantes, url_photo) VALUES (%s, %s, %s)",
+                    [alias_grupo, participantes, url_photo]
                 )
 
             return Response({"message": "Grupo creado exitosamente."}, status=status.HTTP_201_CREATED)

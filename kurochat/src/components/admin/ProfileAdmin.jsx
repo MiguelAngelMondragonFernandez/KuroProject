@@ -123,6 +123,10 @@ const ProfileAdmin = () => {
             onClick={handleLogout}
           />
         </div>
+        <div className="field">
+          
+                              <Button label='Ver mis chats' onClick={()=>{navigate('/chats')}}  style={{background: 'black', color: 'white'}} />
+        </div>
       </div>
 
       <EditProfile

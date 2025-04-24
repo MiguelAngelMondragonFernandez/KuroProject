@@ -50,7 +50,7 @@ export default {
             }
         });
 
-        return formDataInstance.post(import.meta.env.VITE_URL_SERVERIMG + '/upload', file);
+        return formDataInstance.post(import.meta.env.VITE_URL_SERVERIMG , file);
     },
 
     async doPatch(url, data) {

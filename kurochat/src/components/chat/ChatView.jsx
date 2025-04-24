@@ -17,12 +17,26 @@ export const ChatView = ({idChat, name}) => {
     const virtualScrollerRef = useRef(null);
     const [heartBeat, setHeartBeat] = useState(name);
     const [urlImage, setUrlImage] = useState('');
+
+    const tratementMessage = (list) => {
+        let previousDate = null;
+        const newList = list.map((item) => {
+            const date = item.fecha;
+            if (date !== previousDate) {
+                item.dateIdentificator = date;
+                previousDate = date;
+            }
+            return item;
+        });
+        return newList;
+    }
+
     const getMessage = async () => {
         try {
             await axios.doGet('mensajes/get/'+idChat+'/')
             .then(response => {
                 const { mensajes } = response.data;
-                setItems(mensajes);
+                setItems(tratementMessage(mensajes));
                 setHeartBeat(name)
                 
             })
@@ -102,6 +116,7 @@ export const ChatView = ({idChat, name}) => {
                 message={item.mensaje}
                 date={item.fecha}
                 img={item.url_photo}
+                dateIdentificator={item.dateIdentificator}
             />
         );
     };

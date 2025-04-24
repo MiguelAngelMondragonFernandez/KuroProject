@@ -2,41 +2,87 @@ import React, { useState, useContext } from 'react'
 import axios from '../utils/httpgateway';
 import { LanguageContext } from '../components/LanguageContext';
 import { showAlert } from '../utils/alerts';
-
-const AddUser = ({ onClose, onAddUser,fetchChats }) => {
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
+import { Divider } from 'primereact/divider';
+import FileUploader from './FileInput';
+import { useEffect } from 'react';
+const AddUser = ({ onClose, onAddUser, fetchChats, friends }) => {
+    const [email, setEmail] = useState("")
     const [groupName, setGroupName] = useState("");
     const [loading, setLoading] = useState(false);
     const [emails, setEmails] = useState([""]);
+    const [validEmails, setValidEmails] = useState([false]);
+    const [validGroupName, setValidGroupName] = useState(false);
+    const [file, setFile] = useState(null);
     const { translations } = useContext(LanguageContext);
+
+
+    const asignarFile = (file) => {
+        setFile(file);
+    }
+    
+
+
+    const validateEmail = (email, index) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const isValid = emailRegex.test(email.trim());
+        const updatedValidEmails = [...validEmails];
+        updatedValidEmails[index] = !isValid;
+        setValidEmails(updatedValidEmails);
+    };
+
+    const validateGroupName = (name) => {
+        setValidGroupName(name.trim() === "");
+    };
 
     const handleAddEmailField = () => {
         setEmails([...emails, '']);
+        setValidEmails([...validEmails, false]);
     };
 
     const handleEmailChange = (index, value) => {
         const updatedEmails = [...emails];
         updatedEmails[index] = value;
         setEmails(updatedEmails);
+        validateEmail(value, index);
+    };
+
+    const handleGroupNameChange = (value) => {
+        setGroupName(value);
+        validateGroupName(value);
     };
 
     const handleRemoveEmailField = (index) => {
         const updatedEmails = emails.filter((_, i) => i !== index);
+        const updatedValidEmails = validEmails.filter((_, i) => i !== index);
         setEmails(updatedEmails);
+        setValidEmails(updatedValidEmails);
     };
 
     const fetchEmailIds = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             const userEmail = user.email;
-            const ids = await Promise.all(
-                emails
-                    .filter(email => email.trim() !== userEmail)
-                    .map(async (email) => {
-                        const response = await axios.doGet(`users/getByEmail/${email.trim()}/`);
-                        return response.data.id;
-                    })
-            );
+            const ids = [];
+            const invalidEmails = []; 
+
+            for (const email of emails) {
+                if (email.trim() === userEmail) continue; 
+                try {
+                    const response = await axios.doGet(`users/getByEmail/${email.trim()}/`);
+                    console.log(response);
+                    
+                    ids.push(response.data.id);
+                } catch (error) {
+                    console.error(`No se encontró el usuario con el correo: ${email}`);
+                    invalidEmails.push(email); 
+                }
+            }
             ids.push(user.id);
+            if (invalidEmails.length > 0) {
+                throw new Error(`No se encontraron los siguientes correos: ${invalidEmails.join(', ')}`);
+            }
             return ids.join(',');
         } catch (error) {
             console.error('Error al obtener los IDs de los correos:', error);
@@ -47,104 +93,162 @@ const AddUser = ({ onClose, onAddUser,fetchChats }) => {
     const handleCreateGroup = async () => {
         const userId = JSON.parse(localStorage.getItem('user'));
         const userEmail = userId.email;
+        var url_group = 'default_group.png';
+        if (file) {
+        await axios.doPostFormData(file)
+            .then(response => {
+                const { path } = response.data;
+                url_group = path;
+            }).catch((error) => {
+                showAlert('error', 'Error al crear el grupo', 'Hubo un problema al crear el grupo. Verifique bien los datos.');
+            });
+        }
 
-        if (emails.some(email => email.trim() === '')) {
-            showAlert('error', 'Por favor, completa todos los campos de correo.', 'Campos incompletos');
+
+        if (validEmails.some(isInvalid => isInvalid) || validGroupName) {
+            showAlert('error', 'Formulario inválido', 'Por favor, corrige los errores antes de continuar.');
             return;
         }
 
-        if (emails.length > 1 && groupName.trim() === '') {
-            showAlert('error', 'Error',translations.nameGroupObligated);
+        const emailSet = new Set(emails.map(email => email.trim()));
+        if (emailSet.size !== emails.length) {
+            showAlert('error', 'Formulario inválido', 'No puedes agregar el mismo correo más de una vez.');
             return;
         }
 
-        if (emails.includes(userEmail)) {
-            showAlert('error', translations.friendsEmailMyself, 'Error');
-            return;
+        const updatedValidEmails = emails.map(email => email.trim() === "");
+        setValidEmails(updatedValidEmails);
+
+        if (emails.length > 1) {
+            setValidGroupName(groupName.trim() === "");
         }
+
 
         setLoading(true);
 
         try {
             showAlert('loading', `${translations.wait}`,`${translations.chatCreating} `);
             const emailIds = await fetchEmailIds();
+            const newChatParticipants = emailIds.split(',').map(id => id.trim());
+
+
+            /**console.log("Ids", emailIds);
+            console.log("Datos enviados al backend:", {
+                participantes: emailIds,
+                alias_grupo: emails.length > 1 ? groupName : '',
+            });*/
+            
             const response = await axios.doPost('conversaciones/create/', {
                 participantes: emailIds,
                 alias_grupo: emails.length > 1 ? groupName : '',
+                url_photo: url_group,
             });
 
-            showAlert('success', translations.chatCreate, translations.chatCreate );
+            showAlert('success', 'Chat creado', 'El chat se creó exitosamente.');
             onAddUser(response.data);
+            if (fetchChats) {
+                fetchChats();
+
+            }
             setEmails(['']);
             setGroupName('');
             onClose();
             fetchChats();
         } catch (error) {
-            console.error("Error", error);
-            showAlert('error', translations.chatCreateError, 'Error');
+            if (error.message) {
+                console.log(error.message);
+                
+                showAlert('error', 'Error al crear el chat', 'No existe un usuario con ese correo');
+            } else {
+                showAlert('error', 'Error al crear el chat', 'Hubo un problema al crear el chat. Verifique bien los datos.');
+            }
+
         } finally {
             setLoading(false);
         }
     };
 
-    return (
-        <div className="p-5">
-            <h2 className="text-lg font-bold mb-4">{translations.addFriend}</h2>
-            {emails.length > 1 && (
-                <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1">{translations.nameGroup}</label>
-                    <input
-                        type="text"
-                        className="w-full p-2 border rounded"
-                        value={groupName}
-                        onChange={(e) => setGroupName(e.target.value)}
-                        placeholder={translations.inputGroup}
-                    />
-                </div>
-            )}
-            {emails.map((email, index) => (
-                <div key={index} className="mb-3 flex items-center">
-                    <input
+    return (<div className="p-5 surface-card border-round shadow-2">
+        <h2 className="text-2xl font-semibold mb-4 text-primary">{emails.length > 1 ? 'Crear Grupo' : 'Agregar Usuario'}</h2>
+        {
+            emails.length > 1 &&(
+        <div className="field">
+                    <h3>Foto del grupo:</h3>
+                    <FileUploader File={asignarFile} />
+                    </div>
+                    )
+        }
+    
+        {emails.length > 1 && (
+            <div className="mb-4">
+                <label className="block text-sm font-medium text-900 mb-2">Nombre del Grupo</label>
+                <InputText
+                    value={groupName}
+                    onChange={(e) => handleGroupNameChange(e.target.value)}
+                    placeholder="Ingresa el nombre del grupo"
+                    className={`w-full ${validGroupName ? 'p-invalid' : ''}`}
+                />
+                {validGroupName && (
+                    <small className="text-red-500">El nombre del grupo es obligatorio</small>
+                )}
+            </div>
+        )}
+    
+        {emails.map((email, index) => (
+            <div key={index} className="mb-3">
+                <div className="flex align-items-center gap-2">
+                    <InputText
                         type="email"
-                        className="w-full p-2 border rounded"
                         value={email}
                         onChange={(e) => handleEmailChange(index, e.target.value)}
-                        placeholder={`${translations.friendsEmail} ${index + 1}`}
+                        placeholder={`Correo electrónico ${index + 1}`}
+                        className={`flex-1 ${validEmails[index] ? 'p-invalid' : ''}`}
                     />
                     {index > 0 && (
-                        <button
-                            className="ml-2 bg-red-500 text-white px-2 py-1 rounded"
+                        <Button
+                            icon="pi pi-trash"
+                            severity="danger"
+                            className="p-button-sm"
                             onClick={() => handleRemoveEmailField(index)}
-                        >
-                            -
-                        </button>
+                            tooltip="Eliminar correo"
+                            tooltipOptions={{ position: 'top' }}
+                        />
                     )}
                 </div>
-            ))}
-            <button
-                className="bg-green-500 w-full text-white px-4 py-2 rounded mb-3"
-                onClick={handleAddEmailField}
-            >
-                + {translations.addAnother}
-            </button>
-            <div className="flex justify-end">
-                <button
-                    className="bg-gray-500 w-full text-white px-4 py-2 rounded mr-2"
-                    onClick={onClose}
-                    disabled={loading}
-                >
-                    {translations.cancelacion}
-                </button>
-                <button
-                    className="bg-blue-500 w-full text-white px-4 py-2 rounded"
-                    onClick={handleCreateGroup}
-                    disabled={loading}
-                >
-                    {loading ? translations.wait : translations.save}
-                </button>
+                {validEmails[index] && (
+                    <small className="text-red-500 block mt-1">El correo electrónico no es válido</small>
+                )}
             </div>
+        ))}
+    
+        <div className="mb-4">
+            <Button
+                icon="pi pi-plus"
+                label="Agregar otro correo"
+                severity="success"
+                className="w-full"
+                onClick={handleAddEmailField}
+            />
         </div>
-    );
-};
-
-export default AddUser;
+    
+        <Divider />
+    
+        <div className="flex justify-content-end gap-2">
+            <Button
+                label="Cancelar"
+                severity="secondary"
+                onClick={onClose}
+                disabled={loading}
+            />
+            <Button
+                label={loading ? 'Creando...' : 'Crear Chat'}
+                icon={loading ? 'pi pi-spin pi-spinner' : 'pi pi-check'}
+                severity="primary"
+                onClick={handleCreateGroup}
+                disabled={loading}
+            />
+        </div>
+    </div>
+    )
+}
+export default AddUser

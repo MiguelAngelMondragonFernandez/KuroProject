@@ -5,7 +5,7 @@ import React from "react";
 import { showAlert } from "../utils/alerts";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+function Login({update}) {
     const [isMounted, setIsMounted] = React.useState(false);
     const [typeInput, setTypeInput] = React.useState("password");
     const [email, setEmail] = React.useState("");
@@ -45,6 +45,7 @@ function Login() {
                 usuario: user.id,
                 id: null,
             }));
+            update();
             showAlert('success', 'Inicio de sesión exitoso', '¡Bienvenido!')
             setTimeout(() => {
                 navigate('/chats')

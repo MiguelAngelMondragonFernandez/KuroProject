@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function Message({ idUser, message, date, img }) {
+function Message({ idUser, message, date, img, dateIdentificator }) {
     const [userId] = useState(JSON.parse(localStorage.getItem('user')).id);
 
     const containerStyle = {
@@ -40,6 +40,15 @@ function Message({ idUser, message, date, img }) {
     };
 
     return (
+        <>
+        {
+            dateIdentificator && (
+                <div style={{ textAlign: 'center', margin: '10px 0', color: '#fff' }}>
+                    <div style={{backgroundColor: "#000", borderRadius: '10px', padding: '5px 10px', display: 'inline-block'}}>
+                    {dateIdentificator}
+                    </div>
+                </div>
+            )}
         <div style={containerStyle}>
             {idUser !== userId && (
                 <div>
@@ -76,6 +85,7 @@ function Message({ idUser, message, date, img }) {
                 </div>
             )}
         </div>
+        </>
     );
 }
 
